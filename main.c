@@ -45,6 +45,9 @@ static void socket_init(void) {
 #endif
 
 //#include ".h"
+#include <string.h>
+#include <limits.h>
+#include <math.h>
 
 /* channel parameters */
 
@@ -82,13 +85,13 @@ typedef struct Item_node {
     char domain_name[DOMAIN_NAME_SIZE];
     unsigned char valid;
     unsigned long ttl;
-    Item_node* next_item;
+    struct Item_node *next_item_node;
 }Item_node, *Item_link;
 
 static Item_node *new_item_node() {
     Item_node *item_node = (Item_node *)malloc(sizeof(Item_node));
     item_node->valid = 0;
-    item_node->next_item = NULL;
+    item_node->next_item_node = NULL;
     return item_node;
 }
 
@@ -98,23 +101,63 @@ static void *delete_item_node(Item_node *item_node) {
 
 #define new_item_link new_item_node
 
-static void *delete_item_link(Item_link item_link) {
-    for (Item_node *p = item_link->next_item; p; p = item_link->next_item) {
-        item_link->next_item = p->next_item;
+static void delete_item_link(Item_link item_link) {
+    if (!item_link) return;
+    for (Item_node *p = item_link->next_item_node; p; p = item_link->next_item_node) {
+        item_link->next_item_node = p->next_item_node;
         free(p);
     }
+    free(item_link);
 }
 
-static Item *new_item_array(int size) {
-    Item *item_p = (Item *)malloc(size * sizeof(Item));
-    for (int k = 0; k < size; ++k) {
-        item_p[k].valid = 0;
+typedef struct Item_bucket_node {
+    unsigned int ip;
+    char domain_name[DOMAIN_NAME_SIZE];
+    Item_link item_link;
+    struct Item_bucket_node *next_bucket_node;
+}Item_bucket_node, *Item_bucket_link;
+
+static Item_bucket_node *new_item_bucket_node() {
+    Item_bucket_node *item_bucket_node = (Item_bucket_node *)malloc(sizeof(Item_bucket_node));
+    item_bucket_node->item_link = NULL;
+    item_bucket_node->next_bucket_node = NULL;
+    return item_bucket_node;
+}
+
+static void delete_item_bucket_node(Item_bucket_node *item_bucket_node) {
+    free(item_bucket_node);
+}
+
+#define new_item_bucket_link new_item_bucket_node
+
+static void delete_item_bucket_link(Item_bucket_link item_bucket_link) {
+    if (!item_bucket_link) return;
+    for (Item_bucket_node *p = item_bucket_link->next_bucket_node; p; p = item_bucket_link->next_bucket_node) {
+        item_bucket_link->next_bucket_node = p->next_bucket_node;
+        delete_item_link(p->item_link);
+        free(p);
     }
-    return item_p;
+    delete_item_link(item_bucket_link->item_link);
+    free(item_bucket_link);
 }
 
-static void delete_item_array(Item *item_array) {
-    free(item_array);
+static Item_bucket_link *new_item_bucket_array(int size) {
+    Item_bucket_link *item_bucket_array = (Item_bucket_link *)malloc(size * sizeof(Item_bucket_link));
+    //Item_bucket_node **item_bucket_array = (Item_bucket_node **)malloc(size * sizeof(Item_bucket_node *));
+    for (int k = 0; k < size; ++k) {
+        item_bucket_array[k] = new_item_bucket_link();
+        item_bucket_array[k]->next_bucket_node = NULL;
+        item_bucket_array[k]->item_link = NULL;
+    }
+    return item_bucket_array;
+}
+
+static void delete_item_bucket_array(Item_bucket_link *item_bucket_array, int size) {
+    for (int k = 0; k < size; ++k) {
+        delete_item_link(item_bucket_array[k]->item_link);
+        delete_item_bucket_link(item_bucket_array[k]->next_bucket_node);
+    }
+    free(item_bucket_array);
 }
 
 //end of datastruct
@@ -135,7 +178,9 @@ static char **dnsinvmap_domain_name = NULL;
 static unsigned int *dnsmap_ip;
 static unsigned int *dnsinvmap_ip;
 static char *dnsinvmap_valid;
-static Item *domain_name_map = NULL;
+
+static Item_bucket_link *domain_name_map = NULL;
+static Item_bucket_link *ip_map = NULL;
 
 static struct option intopts[] = {
 	{ "help",	no_argument, NULL, '?' },
@@ -249,14 +294,14 @@ static void config(int argc, char *argv[]) {
     */
 
 #ifdef _WIN32
-	strcpy(log_fname, "log.txt");
+	strncpy(log_fname, "log.txt", 10);
 	for (i = 0; i < argc; i++)
 		sprintf(log_fname + strlen(log_fname), "%s ", argv[i]);
 	SetConsoleTitle(log_fname);
 #endif
-	strcpy(log_fname, "log.txt");
-    strcpy(config_fname, DEFAULT_CONFIG_FILE);
-    strcpy(server_ip, DEFAULT_SERVER_IP);
+	strncpy(log_fname, "log.txt", 10);
+    strncpy(config_fname, DEFAULT_CONFIG_FILE, 20);
+    strncpy(server_ip, DEFAULT_SERVER_IP, 20);
 
 	while ((opt = getopt_long(argc, argv, OPT_SHORT, intopts, NULL)) != -1) {
 		switch (opt) {
@@ -303,7 +348,7 @@ static void config(int argc, char *argv[]) {
 	if (optind == argc) 
 		//goto usage;
 
-	if (stricmp(log_fname, "nul") == 0)
+	if (strncmp(log_fname, "nul", 10) == 0)
 		log_file = NULL;
 	else if ((log_file = fopen(log_fname, "w")) == NULL) 
 		printf("WARNING: Failed to create log file \"%s\": %s\n", log_fname, strerror(errno));
@@ -311,108 +356,168 @@ static void config(int argc, char *argv[]) {
     if ((config_file = fopen(config_fname, "r")) == NULL) 
 		printf("WARNING: Failed to open config file \"%s\": %s\n", config_fname, strerror(errno));
 
-	lprintf("src.c, version %s, chunkitlaucont@outlook.com\n", VERSION);
-	lprintf("Log file \"%s\", Config file \"%s\"\n", log_fname, config_fname);
-	lprintf("Server ip %s, TCP port %d, debug mask 0x%02x\n", server_ip, port, debug_mask);
+	printf("src.c, version %s, chunkitlaucont@outlook.com\n", VERSION);
+	printf("Log file \"%s\", Config file \"%s\"\n", log_fname, config_fname);
+	printf("Server ip %s, TCP port %d, debug mask 0x%02x\n", server_ip, port, debug_mask);
 }
 
-static int hash_string(char *name_size) {
+static int hash_string(char *domain_name) {
     int index = 0;
-    for (int k = 0; (k < DOMAIN_NAME_SIZE) && name_size[k]; ++k) {
-        index = (index * prime1 + name_size[k]) % cache_size;
-    }
-    int counter = 0;
-    while ((counter < cache_size) && dnsmap_domain_name[index][0] && strncmp(name_size, dnsmap_domain_name[index], DOMAIN_NAME_SIZE)) {
-        index = (index + 1 < cache_size) ? index + 1 : 0;
-        ++counter;
-    }
-    if (counter >= cache_size) {
-        lprintf("cache haven't enough memory\n");
-        return -1;
+    for (int k = 0; (k < DOMAIN_NAME_SIZE) && domain_name[k]; ++k) {
+        index = (index * prime1 + domain_name[k]) % cache_size;
     }
     return index;
 }
 
-static int dnsmap_insert(char *domain_name, unsigned int ip) {
+static void assign_item_node(Item_node *item_node_p, char *domain_name, unsigned int ip, unsigned long ttl) {
+    item_node_p->valid = 1;
+    strncpy(item_node_p->domain_name, domain_name, DOMAIN_NAME_SIZE);
+    item_node_p->ip = ip;
+    item_node_p->ttl = ttl;
+}
+
+static void insert_item_node(Item_bucket_node *item_bucket_node, char *domain_name, unsigned int ip, unsigned long ttl) {
+    if (!item_bucket_node->next_bucket_node) {
+        item_bucket_node->next_bucket_node = new_item_bucket_node();
+        strncpy(item_bucket_node->next_bucket_node->domain_name, domain_name, DOMAIN_NAME_SIZE);
+        item_bucket_node->next_bucket_node->ip = ip;
+        item_bucket_node->next_bucket_node->item_link = new_item_link();
+        item_bucket_node->next_bucket_node->item_link->next_item_node = new_item_node();
+        assign_item_node(item_bucket_node->next_bucket_node->item_link->next_item_node, domain_name, ip, ttl);
+        
+    }
+    else {
+        int exist = 0;
+        for (Item_node *p = item_bucket_node->next_bucket_node->item_link; p->next_item_node; p = p->next_item_node) {
+            if (p->next_item_node->ip == ip && !strncmp(p->next_item_node->domain_name, domain_name, DOMAIN_NAME_SIZE)) {
+                exist = 1;
+                break;
+            }
+        }
+        if (!exist) {
+            Item_node *p = new_item_node();
+            assign_item_node(p, domain_name, ip, ttl);
+            p->next_item_node = item_bucket_node->next_bucket_node->item_link->next_item_node;
+            item_bucket_node->next_bucket_node->item_link->next_item_node = p;
+        }
+    }
+}
+
+static Item_bucket_node *domain_name_map_find(char *domain_name) {
     int index = hash_string(domain_name);
-    if (index < 0) {
-        return -1;
+
+    Item_bucket_node *item_bucket_node = domain_name_map[index];
+    while (item_bucket_node->next_bucket_node && item_bucket_node->next_bucket_node->item_link 
+        && strncmp(domain_name, item_bucket_node->next_bucket_node->domain_name, DOMAIN_NAME_SIZE)) {
+            item_bucket_node = item_bucket_node->next_bucket_node;
     }
-    if (!dnsmap_domain_name[index][0]) {
-        strncpy(dnsmap_domain_name[index], domain_name, DOMAIN_NAME_SIZE);
-        dnsmap_ip[index] = ip;
-    }
-    else if (dnsmap_ip[index] != ip) {
-        lprintf("replace the ip of domain name %s from %ux to %ux\n", dnsmap_domain_name[index], dnsmap_ip[index], ip);
-        dnsmap_ip[index] = ip;
-    }
-    return 0;
+
+    return item_bucket_node;
 }
 
-static int hash_int(unsigned int ip) {
+static void domain_name_map_insert(char *domain_name, unsigned int ip, unsigned long ttl) {
+    Item_bucket_node *item_bucket_node = domain_name_map_find(domain_name);
+
+    insert_item_node(item_bucket_node, domain_name, ip, ttl);
+}
+
+static Item_bucket_node *ip_map_find(unsigned int ip) {
     int index = ip % cache_size;
-    int counter = 0;
-    while ((counter < cache_size) && dnsinvmap_valid[index] && (ip != dnsinvmap_ip[index])) {
-        index = (index + 1 < cache_size) ? index + 1 : 0;
-        ++counter;
+
+    Item_bucket_node *item_bucket_node = ip_map[index];
+    while (item_bucket_node->next_bucket_node && item_bucket_node->next_bucket_node->item_link 
+        && (ip != item_bucket_node->next_bucket_node->ip)) {
+            item_bucket_node = item_bucket_node->next_bucket_node;
     }
-    if (counter >= cache_size) {
-        lprintf("cache haven't enough memory\n");
-        return -1;
-    }
-    return index;
+
+    return item_bucket_node;
 }
 
-static int dnsinvmap_insert(char *domain_name, unsigned int ip) {
-    int index = hash_int(domain_name);
-    if (index < 0) {
-        return -1;
+static void ip_map_insert(char *domain_name, unsigned int ip, unsigned long ttl) {
+    Item_bucket_node *item_bucket_node = ip_map_find(ip);
+
+    insert_item_node(item_bucket_node, domain_name, ip, ttl);
+}
+
+static char ipdecstring[20];
+
+static char* iphexnum2decstring(unsigned int hex) {
+    for (int k = 0, l = 0; l < 4; ++l) {
+        for (int val = (hex >> ((3 - l) * 8)) & ((1 << 8) - 1), m = 100, flag = 0; m > 0; m = m / 10) {
+            if (val >= m || m == 1 || flag) {
+                ipdecstring[k++] = val / m + '0';
+                val = val % m;
+                flag = 1;
+            }
+        }
+        if (l != 3) {
+            ipdecstring[k++] = '.';
+        }
+        else {
+            ipdecstring[k++] = 0;
+        }
     }
-    if (!dnsinvmap_ip[index]) {
-        strncpy(dnsinvmap_domain_name[index], domain_name, DOMAIN_NAME_SIZE);
-        dnsinvmap_ip[index] = ip;
-        dnsinvmap_valid = 1;
-    }
-    else if (strncmp(domain_name, dnsmap_domain_name[index], DOMAIN_NAME_SIZE)) {
-        lprintf("replace the domain name of ip %ux from %s to %s\n", ip, dnsinvmap_domain_name[index], domain_name);
-        strncpy(dnsinvmap_domain_name[index], domain_name, DOMAIN_NAME_SIZE);
-    }
-    return 0;
+    return ipdecstring;
 }
 
 static int server_init() {
+    printf("static int server_init();\n");
+
     unsigned int ip_part1, ip_part2, ip_part3, ip_part4;
     char domain_name[DOMAIN_NAME_SIZE];
 
-    domain_name_map = new_item_array(cache_size);
+    
+    domain_name_map = new_item_bucket_array(cache_size);
+    ip_map = new_item_bucket_array(cache_size);
 
-    dnsmap_domain_name = (char **)malloc(cache_size * sizeof(char *));
-    for (int k = 0; k < cache_size; ++k) {
-        dnsmap_domain_name[k] = (char *)malloc(DOMAIN_NAME_SIZE * sizeof(char));
-        dnsmap_domain_name[k][0] = 0;
-    }
 
-    dnsmap_ip = (unsigned int *)malloc(cache_size * sizeof(unsigned int));
-    dnsinvmap_valid = (char *)malloc(cache_size * sizeof(char));
+    FILE *input_file = fopen("input.txt", "r");
+    FILE *output_file = fopen("output.txt", "w");
 
-    dnsinvmap_domain_name = (char **)malloc(cache_size * sizeof(char *));
-    for (int k = 0; k < cache_size; ++k) {
-        dnsinvmap_domain_name[k] = (char *)malloc(DOMAIN_NAME_SIZE * sizeof(char));
-        dnsinvmap_domain_name[k][0] = 0;
-        dnsinvmap_valid[k] = 0;
-    }
 
-    dnsinvmap_ip = (unsigned int *)malloc(cache_size * sizeof(unsigned int));
-
-    while (fscanf(config_file,"%u.%u.%u.%u %s\n", ip_part1, ip_part2, ip_part3, ip_part4, domain_name)) {
+    while (fscanf(config_file,"%u.%u.%u.%u %s\n", &ip_part1, &ip_part2, &ip_part3, &ip_part4, domain_name) != EOF) {
         unsigned int ip = (ip_part1 << 24) + (ip_part2 << 16) + (ip_part3 << 8) + ip_part4;
-        if (dnsmap_insert(domain_name, ip) < 0) {
-            return -1;
-        }
-        if (dnsinvmap_insert(domain_name, ip) < 0) {
-            return -1;
-        }
+
+        domain_name_map_insert(domain_name, ip, ULONG_MAX);
+        ip_map_insert(domain_name, ip, ULONG_MAX);
     }
+
+    while (1) {
+        //printf("please input a domain name\n");
+        //scanf("%s", domain_name);
+        /*
+        if (fscanf(input_file,"%s",domain_name) == EOF) {
+            break;
+        }
+        */
+        if (fscanf(input_file,"%u.%u.%u.%u", &ip_part1, &ip_part2, &ip_part3, &ip_part4) == EOF) {
+            break;
+        }
+        unsigned int ip = (ip_part1 << 24) + (ip_part2 << 16) + (ip_part3 << 8) + ip_part4;
+
+        //Item_bucket_node *item_bucket_node = domain_name_map_find(domain_name);
+        Item_bucket_node *item_bucket_node = ip_map_find(ip);
+        if (!item_bucket_node || !item_bucket_node->next_bucket_node || 
+            !item_bucket_node->next_bucket_node->item_link || 
+            !item_bucket_node->next_bucket_node->item_link->next_item_node) {
+            printf("cann't resolved domain name %s\n", domain_name);
+        }
+        else {
+
+            //printf("IP of resolved domain name %s:\n", domain_name);
+            Item_node *item_node = item_bucket_node->next_bucket_node->item_link;
+            while (item_node->next_item_node) {
+                //printf("%x\n", item_node->next_item_node->ip);
+                fprintf(output_file,"%s %s\n",iphexnum2decstring(item_node->next_item_node->ip), item_node->next_item_node->domain_name);
+                item_node = item_node->next_item_node;
+            }
+        }
+
+        fscanf(input_file,"%s",domain_name);
+    }    
+
+    return -1;
+
     int admin_sock, i;
     struct sockaddr_in server_name;
     struct sockaddr_in client_name;
@@ -424,45 +529,45 @@ static int server_init() {
 
         admin_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (admin_sock < 0) 
-            ABORT("Create TCP socket");
+            printf("Create TCP socket\n");
         if (bind(admin_sock, (struct sockaddr *)&server_name, sizeof(server_name)) < 0) {
-            lprintf("Station A: Failed to bind TCP port %u", port);
-            ABORT("Station A failed to bind TCP port");
+            printf("Station A: Failed to bind TCP port %u\n", port);
+            printf("Station A failed to bind TCP port\n");
         }
 
         listen(admin_sock, 5);
 
-        lprintf("Station A is waiting for station B on TCP port %u ... ", port);
+        printf("Station A is waiting for station B on TCP port %u ... \n", port);
         fflush(stdout);
 
         server_sock = accept(admin_sock, 0, 0);
         if (server_sock < 0) 
-            ABORT("Station A failed to communicate with station B");
-        lprintf("Done.\n");
+            printf("Station A failed to communicate with station B\n");
+        printf("Done.\n");
     }
     {
         client_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (client_sock < 0) 
-            ABORT("Create TCP socket");
+            printf("Create TCP socket\n");
 
         client_name.sin_family = AF_INET;
         client_name.sin_addr.s_addr = inet_addr("127.0.0.1");
         client_name.sin_port = htons((short)port);
 
         for (i = 0; i < 60; i++) {
-            lprintf("Station B is connecting station A (TCP port %u) ... ", port);
+            printf("Station B is connecting station A (TCP port %u) ... \n", port);
             fflush(stdout);
 
             if (connect(client_sock, (struct sockaddr *)&client_name, sizeof(struct sockaddr_in)) < 0) {
-                lprintf("Failed!\n");
-                Sleep(2000);
+                printf("Failed!\n");
+                sleep(2000);
             } else {
-                lprintf("Done.\n");
+                printf("Done.\n");
                 break;
             }
         }
         if (i == 6)
-            ABORT("Station B failed to connect station A");
+            printf("Station B failed to connect station A\n");
     }
 
 }
@@ -472,7 +577,7 @@ int main(int argc, char *argv[]) {
     if (server_init() < 0) {
         return 1;
     }
-    lprintf("DNS Relay Server ---- Designed by Liu Junjie, build: 2021\n");
+    printf("DNS Relay Server ---- Designed by Liu Junjie, build: 2021\n");
     unsigned char rcvbuf[4096];
     struct HEADER *p;
     int ret;
