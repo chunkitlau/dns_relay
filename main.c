@@ -73,7 +73,7 @@ static void socket_init(void) {
 /* Parameters */
 
 static int server_sock;
-static int debug_level = 0; 
+static int debug_level = 1; 
 static unsigned short port = DEFAULT_PORT;
 static int cache_size = DEFAULT_CACHE_SIZE;
 static char server_ip[20];
@@ -311,7 +311,7 @@ static void config(int argc, char *argv[]) {
 			"\nOptions : \n"
 			"    -?, --help : print this\n"
 			"    -n, --nolog : nolog (default: log)\n"
-			"    -d, --debug=<0-2>: debug level (0:basic, 1:info, 2:debug) (default: basic)\n"
+			"    -d, --debug=<0-2>: debug level (0:basic, 1:info, 2:debug) (default: info)\n"
 			"    -s, --serverip=<ip#> : DNS server ip number (default: %s)\n"
 			"    -p, --port=<port#> : DNS server port number (default: %u)\n"
 			"    -c, --configfile=<filename> : using assigned file as config file (default: %s)\n"
@@ -380,11 +380,11 @@ static void config(int argc, char *argv[]) {
 }
 
 static void lprintf(char *string, unsigned char *buffer, int buffer_size) {
-    printf("%s", string);
+    fprintf(log_file, "%s", string);
     for (int k = 0; k < buffer_size; ++k) {
-        printf("%x ", buffer[k]);
+        fprintf(log_file, "%x ", buffer[k]);
     }
-    printf("\n");
+    fprintf(log_file, "\n");
 }
 
 static void network_init() {
@@ -498,9 +498,9 @@ static void load_config_file() {
 
         unsigned int question_size, buffer_size = form_standard_response(buffer, domain_name, ip, &question_size);
         Message *message = new_message(buffer, buffer_size, question_size, ULONG_MAX);
-        if (debug_level) printf("Info: insert message {domain name: %s, ip: %u.%u.%u.%u} to hash map", domain_name, ip_part1, ip_part2, ip_part3, ip_part4);
+        if (debug_level) fprintf(log_file, "Info: insert message {domain name: %s, ip: %u.%u.%u.%u} to hash map\n", domain_name, ip_part1, ip_part2, ip_part3, ip_part4);
         if (debug_level > 1) {
-            printf("Debug: insert message to hash map, hash is %d, at %x\n", message->hash, message);
+            fprintf(log_file, "Debug: insert message to hash map, hash is %d, at %x\n", message->hash, message);
             lprintf("Debug: message --- ", message->buffer, message->buffer_size);
         }
         message_map_insert(message);
@@ -538,15 +538,15 @@ int main(int argc, char *argv[]) {
         encode_header(header);
 
         if (qr == QUERY_MESSAGE) {
-            if (debug_level) printf("Info: It's a query message\n");
+            if (debug_level) fprintf(log_file, "Info: It's a query message\n");
 
             Message *message = new_message(buffer, n_bytes, n_bytes, ULONG_MAX);
-            if (debug_level > 1) printf("Debug: message hash value is %u\n", message->hash);
+            if (debug_level > 1) fprintf(log_file, "Debug: message hash value is %u\n", message->hash);
             Message_node *message_node = message_map_find(message)->next_message_node;
 
             if (message_node) {
-                if (debug_level) printf("Info: found local record\n");
-                if (debug_level > 1) printf("Debug: found local record message_node at %x, message at %x\n", message_node, message_node->message);
+                if (debug_level) fprintf(log_file, "Info: found local record\n");
+                if (debug_level > 1) fprintf(log_file, "Debug: found local record message_node at %x, message at %x\n", message_node, message_node->message);
                 
                 header = (struct Header *)(message_node->message->buffer);
                 decode_header(header);
@@ -557,12 +557,12 @@ int main(int argc, char *argv[]) {
                 ret = sendto(server_sock, message_node->message->buffer, message_node->message->buffer_size, 0, (struct sockaddr *)&client_addr, sockaddr_in_size);
             }
             else {
-                if (debug_level) printf("Info: can't found local record, ask remote dns server\n");
+                if (debug_level) fprintf(log_file, "Info: can't found local record, ask remote dns server\n");
 
                 Client *client = new_client(id, client_addr, n_bytes);
                 decode_header(header);
                 header->id = client_queue_push(client);
-                if (debug_level > 1)  printf("Debug: assign outsend id %u to {id: %d, ip: %s, port: %x }\n", 
+                if (debug_level > 1)  fprintf(log_file, "Debug: assign outsend id %u to {id: %d, ip: %s, port: %x }\n", 
                                             header->id, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
                 encode_header(header);
 
@@ -571,19 +571,19 @@ int main(int argc, char *argv[]) {
             }
         }
         else if (qr == RESPONSE_MESSAGE) {
-            if (debug_level) printf("Info: It's a response message\n");
+            if (debug_level) fprintf(log_file, "Info: It's a response message\n");
 
             Client *client = client_queue_find(id);
 
             if (client) {
-                if (debug_level) printf("Info: message id is valid, found correspond client, cache this message\n");
+                if (debug_level) fprintf(log_file, "Info: message id is valid, found correspond client, cache this message\n");
 
                 Message *message = new_message(buffer, n_bytes, client->question_size, ULONG_MAX);
                 message_map_insert(message);
                 if (debug_level > 1) {
-                    printf("Debug: found correspond record of id %u to {id: %d, ip: %s, port: %x }\n", 
+                    fprintf(log_file, "Debug: found correspond record of id %u to {id: %d, ip: %s, port: %x }\n", 
                         id, inet_ntoa(client->client_addr.sin_addr), ntohs(client->client_addr.sin_port));
-                    printf("Debug: cache message hash is %u, message at %x\n", message->hash, message);
+                    fprintf(log_file, "Debug: cache message hash is %u, message at %x\n", message->hash, message);
                 }
 
                 decode_header(header);
@@ -594,7 +594,7 @@ int main(int argc, char *argv[]) {
                 ret = sendto(server_sock, buffer, n_bytes, 0, (struct sockaddr *)&(client->client_addr), sockaddr_in_size);
             }
             else {
-                if (debug_level) printf("Info: message id is invalid, ignore this message\n");
+                if (debug_level) fprintf(log_file, "Info: message id is invalid, ignore this message\n");
                 if (debug_level > 1) printf("message id %x\n", id);
             }
         }
