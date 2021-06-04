@@ -13,7 +13,8 @@
         "types.h": "c",
         "timeb.h": "c",
         "getopt.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "message.h": "c"
     },
     "C_Cpp.default.intelliSenseMode": "windows-gcc-x64"
 }

@@ -14,56 +14,12 @@
 #define RESPONSE_MESSAGE 1
 #define HEADER_SIZE 12
 #define DEFAULT_TTL 120
-#define CLIENT_QUEUE_SIZE 3000
-
-#ifdef _WIN32 /* for Windows Visual Studio */
-
-#include <winsock2.h>
-#include <io.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/timeb.h>
-#include <ws2tcpip.h>
-#include <getopt.h>
-
-//#define getopt_long getopt_int
-#define stricmp _stricmp
-
-static void socket_init(void);
-
-#pragma comment(lib,"wsock32.lib")
-
-#else /* for Linux */
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/select.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <getopt.h>
-#include <arpa/inet.h>
-#include <netinet/tcp.h>
-#include <netdb.h>
-#define stricmp strcasecmp
-#define socket_init()
-
-#endif
 
 #include <string.h>
 #include <limits.h>
 #include <math.h>
 #include "message.h"
-
-static int debug_level = 1; 
-static unsigned short port = DEFAULT_PORT;
-static int server_sock;
-static char server_ip[20];
-static char dnsserver_ip[20];
-static struct sockaddr_in dnsserver_addr;
+#include "client.h"
 
 /***************************************************
  * RFC1035 4.1
@@ -115,5 +71,13 @@ typedef struct Header {
     unsigned nscount: 16; /* number of authority entries */
     unsigned arcount: 16; /* number of resource entries */
 } Header;
+
+static int debug_level = 1; 
+static unsigned short port = DEFAULT_PORT;
+static int server_sock;
+static char server_ip[20];
+static char dnsserver_ip[20];
+static struct sockaddr_in dnsserver_addr;
+
 
 #endif

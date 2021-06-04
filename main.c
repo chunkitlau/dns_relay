@@ -17,95 +17,11 @@ static void socket_init(void) {
 
 #endif
 
-/////////////////////////////////////////////////////////////////////
-
-/* Parameters */
-
-
-
 static FILE *log_file = NULL;
 static FILE *config_file = NULL;
 
-/* End of Parameters */
 
-/////////////////////////////////////////////////////////////////////
-// component
-/////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////
-// message
-
-
-
-// message
-
-/////////////////////////////////////////////////////////////////////
-// client queue
-// check
-
-typedef struct Client{
-    unsigned id: 16;
-    struct sockaddr_in client_addr;
-    int question_size;
-} Client;
-
-static Client *new_client(unsigned short id, struct sockaddr_in client_addr, int question_size) {
-    Client *client = (Client *)malloc(sizeof(Client));
-    client->id = id;
-    memset(&(client->client_addr), 0, sizeof(client->client_addr));
-    client->client_addr.sin_family = client_addr.sin_family;
-    client->client_addr.sin_addr.s_addr = client_addr.sin_addr.s_addr;
-    client->client_addr.sin_port = client_addr.sin_port;
-    client->question_size = question_size;
-    return client;
-}
-
-static void delete_client(Client *client) {
-    free(client);
-}
-
-static int client_queue_head = 0;
-static int client_queue_tail = 0;
-static Client *client_queue[CLIENT_QUEUE_SIZE];
-static unsigned short client_queue_id[CLIENT_QUEUE_SIZE];
-static unsigned short server_id_counter = 0;
-
-static int client_queue_pre(int p) {
-    return (p) ? (p - 1) : (CLIENT_QUEUE_SIZE - 1);
-}
-
-static int client_queue_next(int p) {
-    return (p + 1 != CLIENT_QUEUE_SIZE) ? (p + 1) : 0;
-}
-
-static unsigned short client_queue_push(Client *client) {
-    unsigned short id = server_id_counter++;
-    client_queue[client_queue_tail] = client;
-    client_queue_id[client_queue_tail] = id;
-    client_queue_tail = client_queue_next(client_queue_tail);
-    if (client_queue_tail == client_queue_head) {
-        client_queue_head = client_queue_next(client_queue_head);
-    }
-    return id;
-}
-
-static int between(unsigned short a, unsigned short b, unsigned short c) {
-    return ((a <= b) && (b < c)) || ((c < a) && (a <= b)) || ((b < c) && (c < a));
-}
-
-static Client *client_queue_find(unsigned short id) {
-    if ((client_queue_head != client_queue_tail) && 
-        between(client_queue_id[client_queue_head], id, client_queue_id[client_queue_pre(client_queue_tail)] + 1)) {
-            int index = client_queue_head + (int)(id - client_queue_id[client_queue_head]);
-            index = (index >= CLIENT_QUEUE_SIZE) ? index - CLIENT_QUEUE_SIZE : index;
-            return client_queue[index];
-    }
-    else {
-        return NULL;
-    }
-}
-
-// client queue
+#define OPT_SHORT "?nd:s:p:c:l:"
 
 static struct option intopts[] = {
 	{ "help",	no_argument, NULL, '?' },
@@ -117,8 +33,6 @@ static struct option intopts[] = {
 	{ "log",	required_argument, NULL, 'l' },
 	{ 0, 0, 0, 0 },
 };
-
-#define OPT_SHORT "?nd:s:p:c:l:"
 
 static void config(int argc, char *argv[]) {
 	char log_fname[1024], config_fname[1024];
@@ -426,4 +340,4 @@ int main(int argc, char *argv[]) {
 }
 
 // sudo vim /etc/resolv.conf
-// gcc main.c -o main -g -lws2_32
+// gcc main.c message.c client.c -o main -g -lws2_32
