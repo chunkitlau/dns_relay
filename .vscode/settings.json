@@ -6,6 +6,13 @@
         "stdlib.h": "c",
         "type_traits": "c",
         "time.h": "c",
-        "select.h": "c"
-    }
+        "select.h": "c",
+        "limits": "c",
+        "ws2tcpip.h": "c",
+        "stdio.h": "c",
+        "types.h": "c",
+        "timeb.h": "c",
+        "getopt.h": "c"
+    },
+    "C_Cpp.default.intelliSenseMode": "windows-gcc-x64"
 }

@@ -1,13 +1,14 @@
 #ifdef _WIN32 /* for Windows Visual Studio */
 
-#include <winsock.h>
+#include <winsock2.h>
 #include <io.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
-#include "getopt.h"
+#include <ws2tcpip.h>
+#include <getopt.h>
 
-#define getopt_long getopt_int
+//#define getopt_long getopt_int
 #define stricmp _stricmp
 
 static void socket_init(void) {
@@ -18,7 +19,7 @@ static void socket_init(void) {
     wVersionRequested = MAKEWORD(1,1);
     status = WSAStartup(wVersionRequested, &WSAData);
     if (status != 0) {
-        printf("Windows Socket DLL Error\n");
+        printf("Windows Socket DLL ret\n");
 	    exit(0);
     }
 }
@@ -45,22 +46,18 @@ static void socket_init(void) {
 
 #endif
 
-//#include ".h"
 #include <string.h>
 #include <limits.h>
 #include <math.h>
 
-/* channel parameters */
-
 #define VERSION "0.1.0"
 #define DEFAULT_PORT 53
-#define DEFAULT_SERVER_IP "202.106.0.20"
+#define DEFAULT_SERVER_IP "127.0.0.1"
 #define DEFAULT_DNSSERVER_IP "114.114.114.114"
 #define DEFAULT_CONFIG_FILE "dnsrelay.txt"
+#define DEFAULT_LOG_FILE "log.txt"
 #define DEFAULT_CACHE_SIZE 3000
 #define DOMAIN_NAME_SIZE 256
-#define WEBSITE_BLOCKING_OPTION 1
-#define WEBSITE_BLOCKING_OPTION 1
 #define STANDARD_QUERY 0
 #define REVERSE_QUERY 1
 #define QUERY_MESSAGE 0
@@ -68,185 +65,22 @@ static void socket_init(void) {
 #define HEADER_SIZE 12
 #define BUFFER_SIZE 1024
 #define DEFAULT_TTL 120
-/* End of channel parameters */
+#define CLIENT_QUEUE_SIZE 3000
+#define PRIME1 257
 
-//datastruct
-
-typedef struct Item {
-    unsigned int ip;
-    char domain_name[DOMAIN_NAME_SIZE];
-    unsigned char valid;
-    unsigned long ttl;
-}Item;
-
-static Item *new_item() {
-    Item *item = (Item *)malloc(sizeof(Item));
-    item->valid = 0;
-    return item;
-}
-
-static void delete_item(Item *item) {
-    free(item);
-}
-
-typedef struct Item_node {
-    unsigned int ip;
-    char domain_name[DOMAIN_NAME_SIZE];
-    unsigned char valid;
-    unsigned long ttl;
-    struct Item_node *next_item_node;
-}Item_node, *Item_link;
-
-static Item_node *new_item_node() {
-    Item_node *item_node = (Item_node *)malloc(sizeof(Item_node));
-    item_node->valid = 0;
-    item_node->next_item_node = NULL;
-    return item_node;
-}
-
-static void *delete_item_node(Item_node *item_node) {
-    free(item_node);
-}
-
-#define new_item_link new_item_node
-
-static void delete_item_link(Item_link item_link) {
-    if (!item_link) return;
-    for (Item_node *p = item_link->next_item_node; p; p = item_link->next_item_node) {
-        item_link->next_item_node = p->next_item_node;
-        free(p);
-    }
-    free(item_link);
-}
-
-typedef struct Item_bucket_node {
-    unsigned int ip;
-    char domain_name[DOMAIN_NAME_SIZE];
-    Item_link item_link;
-    struct Item_bucket_node *next_bucket_node;
-}Item_bucket_node, *Item_bucket_link;
-
-static Item_bucket_node *new_item_bucket_node() {
-    Item_bucket_node *item_bucket_node = (Item_bucket_node *)malloc(sizeof(Item_bucket_node));
-    item_bucket_node->item_link = NULL;
-    item_bucket_node->next_bucket_node = NULL;
-    return item_bucket_node;
-}
-
-static void delete_item_bucket_node(Item_bucket_node *item_bucket_node) {
-    free(item_bucket_node);
-}
-
-#define new_item_bucket_link new_item_bucket_node
-
-static void delete_item_bucket_link(Item_bucket_link item_bucket_link) {
-    if (!item_bucket_link) return;
-    for (Item_bucket_node *p = item_bucket_link->next_bucket_node; p; p = item_bucket_link->next_bucket_node) {
-        item_bucket_link->next_bucket_node = p->next_bucket_node;
-        delete_item_link(p->item_link);
-        free(p);
-    }
-    delete_item_link(item_bucket_link->item_link);
-    free(item_bucket_link);
-}
-
-static Item_bucket_link *new_item_bucket_array(int size) {
-    Item_bucket_link *item_bucket_array = (Item_bucket_link *)malloc(size * sizeof(Item_bucket_link));
-    for (int k = 0; k < size; ++k) {
-        item_bucket_array[k] = new_item_bucket_link();
-        item_bucket_array[k]->next_bucket_node = NULL;
-        item_bucket_array[k]->item_link = NULL;
-    }
-    return item_bucket_array;
-}
-
-static void delete_item_bucket_array(Item_bucket_link *item_bucket_array, int size) {
-    for (int k = 0; k < size; ++k) {
-        delete_item_link(item_bucket_array[k]->item_link);
-        delete_item_bucket_link(item_bucket_array[k]->next_bucket_node);
-    }
-    free(item_bucket_array);
-}
-
-typedef struct Message{
-    unsigned char *buffer;
-    unsigned int buffer_size;
-    unsigned int question_size;
-    unsigned long ttl;
-} Message;
-
-static Message *new_message(unsigned char *buffer, unsigned int buffer_size, unsigned int question_size, unsigned long ttl) {
-    Message* message = (Message *)malloc(sizeof(Message));
-    message->buffer = (unsigned char *)malloc(message->buffer_size * sizeof(unsigned char));
-    strncpy(message->buffer, buffer, message->buffer_size);
-    message->buffer_size = buffer_size;
-    message->question_size = question_size;
-    message->ttl = ttl;
-    return message;
-}
-
-static void delete_message(Message *message) {
-    free(message->buffer);
-    free(message);
-}
-
-typedef struct Client{
-    unsigned id: 16;
-    struct sockaddr_in client_addr;
-} Client;
-
-static Client *new_client(unsigned int id, struct sockaddr_in client_addr) {
-    Client *client = (Client *)malloc(sizeof(Client));
-    client->id = id;
-    client->client_addr
-    memset(&(client->client_addr), 0, sizeof(client->client_addr));
-    client->client_addr.sin_family = client_addr.sin_family;
-    client->client_addr.sin_addr.s_addr = client_addr.sin_addr.s_addr;
-    client->client_addr.sin_port = client_addr.sin_port;
-    return client;
-}
-
-static void delete_client(Client *client) {
-    free(client);
-}
-
-//end of datastruct
+/////////////////////////////////////////////////////////////////////
 
 /* Parameters */
 
-static int prime1 = 283;
 static int server_sock;
-static int debug_mask = 0; /* debug mask */
+static int debug_level = 0; 
 static unsigned short port = DEFAULT_PORT;
 static int cache_size = DEFAULT_CACHE_SIZE;
 static char server_ip[20];
 static char dnsserver_ip[20];
 static FILE *log_file = NULL;
 static FILE *config_file = NULL;
-static char **dnsmap_domain_name = NULL;
-static char **dnsinvmap_domain_name = NULL;
-static unsigned int *dnsmap_ip;
-static unsigned int *dnsinvmap_ip;
-static char *dnsinvmap_valid;
-static int sockaddr_in_size = sizeof(struct sockaddr_in);
 static struct sockaddr_in dnsserver_addr;
-
-static Item_bucket_link *domain_name_map = NULL;
-static Item_bucket_link *ip_map = NULL;
-static char ipdecstring[20];
-
-static struct option intopts[] = {
-	{ "help",	no_argument, NULL, '?' },
-	{ "nolog",  no_argument, NULL, 'n' },
-	{ "debug",	required_argument, NULL, 'd' },
-	{ "serverip",	required_argument, NULL, 's' },
-	{ "configfile",	required_argument, NULL, 'c' },
-	{ "port",	required_argument, NULL, 'p' },
-	{ "log",	required_argument, NULL, 'l' },
-	{ 0, 0, 0, 0 },
-};
-
-#define OPT_SHORT "?nd:p:l:"
 
 /***************************************************
  * RFC1035 4.1
@@ -282,7 +116,7 @@ static struct option intopts[] = {
  * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  */
 typedef struct Header {
-    unsigned int id;      /* query identification number */
+    unsigned id: 16;      /* query identification number */
     unsigned rd: 1;       /* recursion desired */
     unsigned tc: 1;       /* truncated message */
     unsigned aa: 1;       /* authoritive answer */
@@ -299,147 +133,196 @@ typedef struct Header {
     unsigned arcount: 16; /* number of resource entries */
 } Header;
 
-/***************************************************
- *  Question Section Format (RFC1035 4.1.2)
- *                                 1  1  1  1  1  1
- *   0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
- * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- * |                                               |
- * /                     QNAME                     /
- * /                                               /
- * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- * |                     QTYPE                     |
- * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- * |                     QCLASS                    |
- * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- */
-struct Question {
-    char qname[DOMAIN_NAME_SIZE]; /* A domain name, i.e. www.bupt.edu.cn */
-    unsigned qtype: 16;           /* A two octet code, type of the query, i.e. A(1),MX(15),CNAME(5),PTR(12),... */
-    unsigned qclass: 16;          /* A two octet code, class of the query, i.e. IN(1) */
-};
-
 /* End of Parameters */
 
-//map operation
+/////////////////////////////////////////////////////////////////////
+// component
+/////////////////////////////////////////////////////////////////////
 
-static int hash_string(char *domain_name) {
-    int index = 0;
-    for (int k = 0; (k < DOMAIN_NAME_SIZE) && domain_name[k]; ++k) {
-        index = (index * prime1 + domain_name[k]) % cache_size;
+/////////////////////////////////////////////////////////////////////
+// message
+
+typedef struct Message{
+    unsigned char *buffer;
+    unsigned int buffer_size;
+    unsigned int question_size;
+    unsigned long ttl;
+    unsigned int hash;
+} Message;
+
+typedef struct Message_node{
+    Message *message;
+    struct Message_node *next_message_node;
+} Message_node;
+
+static unsigned char hash_ignore[BUFFER_SIZE];
+static Message_node **message_map;
+
+static unsigned int hash(unsigned char *buffer, unsigned int question_size) {
+    unsigned int hash = 0;
+    for (int k = 0; k < question_size; ++k) {
+        hash = hash * PRIME1 + ((!hash_ignore[k]) ? buffer[k] : 256);
     }
-    return index;
+    return hash;
 }
 
-static void assign_item_node(Item_node *item_node_p, char *domain_name, unsigned int ip, unsigned long ttl) {
-    item_node_p->valid = 1;
-    strncpy(item_node_p->domain_name, domain_name, DOMAIN_NAME_SIZE);
-    item_node_p->ip = ip;
-    item_node_p->ttl = ttl;
+static Message *new_message(unsigned char *buffer, unsigned int buffer_size, unsigned int question_size, unsigned long ttl) {
+    Message* message = (Message *)malloc(sizeof(Message));
+    message->buffer_size = buffer_size;
+    message->buffer = (unsigned char *)malloc(message->buffer_size * sizeof(unsigned char));
+    memcpy(message->buffer, buffer, message->buffer_size);
+    message->question_size = question_size;
+    message->ttl = ttl;
+    message->hash = hash(buffer, question_size);
+    return message;
 }
 
-static void insert_item_node(Item_bucket_node *item_bucket_node, char *domain_name, unsigned int ip, unsigned long ttl) {
-    if (!item_bucket_node->next_bucket_node) {
-        item_bucket_node->next_bucket_node = new_item_bucket_node();
-        strncpy(item_bucket_node->next_bucket_node->domain_name, domain_name, DOMAIN_NAME_SIZE);
-        item_bucket_node->next_bucket_node->ip = ip;
-        item_bucket_node->next_bucket_node->item_link = new_item_link();
-        item_bucket_node->next_bucket_node->item_link->next_item_node = new_item_node();
-        assign_item_node(item_bucket_node->next_bucket_node->item_link->next_item_node, domain_name, ip, ttl);
-        
+static void delete_message(Message *message) {
+    free(message->buffer);
+    free(message);
+}
+
+static void new_message_map() {
+    message_map = (Message_node **)malloc(cache_size * sizeof(Message_node *));
+    for (int k = 0; k < cache_size; ++k) {
+        message_map[k] = (Message_node *)malloc(sizeof(Message_node));
+        message_map[k]->next_message_node = NULL;
+    }
+}
+
+static void delete_message_map() {
+    for (int k = 0; k < cache_size; ++k) {
+        for (Message_node *p = message_map[k]->next_message_node; p; p =  message_map[k]->next_message_node) {
+            message_map[k]->next_message_node = p->next_message_node;
+            free(p);
+        }
+        free(message_map[k]);
+    }
+    free(message_map);
+}
+
+static Message_node *message_map_find(Message *message) {
+    int index = message->hash % cache_size;
+    Message_node *message_node = message_map[index];
+    while(message_node->next_message_node && message_node->next_message_node->message->hash != message->hash) {
+         message_node = message_node->next_message_node;
+    }
+    return message_node;
+}
+
+static void message_map_insert(Message *message) {
+    Message_node *message_node = message_map_find(message);
+    message_node->next_message_node = (Message_node *)malloc(sizeof(Message_node));
+    message_node->next_message_node->message = message;
+    message_node->next_message_node->next_message_node = NULL;
+}
+
+// message
+
+/////////////////////////////////////////////////////////////////////
+// client queue
+// check
+
+typedef struct Client{
+    unsigned id: 16;
+    struct sockaddr_in client_addr;
+    int question_size;
+} Client;
+
+static Client *new_client(unsigned short id, struct sockaddr_in client_addr, int question_size) {
+    Client *client = (Client *)malloc(sizeof(Client));
+    client->id = id;
+    memset(&(client->client_addr), 0, sizeof(client->client_addr));
+    client->client_addr.sin_family = client_addr.sin_family;
+    client->client_addr.sin_addr.s_addr = client_addr.sin_addr.s_addr;
+    client->client_addr.sin_port = client_addr.sin_port;
+    client->question_size = question_size;
+    return client;
+}
+
+static void delete_client(Client *client) {
+    free(client);
+}
+
+static int client_queue_head = 0;
+static int client_queue_tail = 0;
+static Client *client_queue[CLIENT_QUEUE_SIZE];
+static unsigned short client_queue_id[CLIENT_QUEUE_SIZE];
+static unsigned short server_id_counter = 0;
+
+static int client_queue_pre(int p) {
+    return (p) ? (p - 1) : (CLIENT_QUEUE_SIZE - 1);
+}
+
+static int client_queue_next(int p) {
+    return (p + 1 != CLIENT_QUEUE_SIZE) ? (p + 1) : 0;
+}
+
+static unsigned short client_queue_push(Client *client) {
+    unsigned short id = server_id_counter++;
+    client_queue[client_queue_tail] = client;
+    client_queue_id[client_queue_tail] = id;
+    client_queue_tail = client_queue_next(client_queue_tail);
+    if (client_queue_tail == client_queue_head) {
+        client_queue_head = client_queue_next(client_queue_head);
+    }
+    return id;
+}
+
+static int between(unsigned short a, unsigned short b, unsigned short c) {
+    return ((a <= b) && (b < c)) || ((c < a) && (a <= b)) || ((b < c) && (c < a));
+}
+
+static Client *client_queue_find(unsigned short id) {
+    if ((client_queue_head != client_queue_tail) && 
+        between(client_queue_id[client_queue_head], id, client_queue_id[client_queue_pre(client_queue_tail)] + 1)) {
+            int index = client_queue_head + (int)(id - client_queue_id[client_queue_head]);
+            index = (index >= CLIENT_QUEUE_SIZE) ? index - CLIENT_QUEUE_SIZE : index;
+            return client_queue[index];
     }
     else {
-        int exist = 0;
-        for (Item_node *p = item_bucket_node->next_bucket_node->item_link; p->next_item_node; p = p->next_item_node) {
-            if (p->next_item_node->ip == ip && !strncmp(p->next_item_node->domain_name, domain_name, DOMAIN_NAME_SIZE)) {
-                exist = 1;
-                break;
-            }
-        }
-        if (!exist) {
-            Item_node *p = new_item_node();
-            assign_item_node(p, domain_name, ip, ttl);
-            p->next_item_node = item_bucket_node->next_bucket_node->item_link->next_item_node;
-            item_bucket_node->next_bucket_node->item_link->next_item_node = p;
-        }
+        return NULL;
     }
 }
 
-static Item_bucket_node *domain_name_map_find(char *domain_name) {
-    int index = hash_string(domain_name);
+// client queue
 
-    Item_bucket_node *item_bucket_node = domain_name_map[index];
-    while (item_bucket_node->next_bucket_node && item_bucket_node->next_bucket_node->item_link 
-        && strncmp(domain_name, item_bucket_node->next_bucket_node->domain_name, DOMAIN_NAME_SIZE)) {
-            item_bucket_node = item_bucket_node->next_bucket_node;
-    }
+static struct option intopts[] = {
+	{ "help",	no_argument, NULL, '?' },
+	{ "nolog",  no_argument, NULL, 'n' },
+	{ "debug",	required_argument, NULL, 'd' },
+	{ "serverip",	required_argument, NULL, 's' },
+	{ "port",	required_argument, NULL, 'p' },
+	{ "configfile",	required_argument, NULL, 'c' },
+	{ "log",	required_argument, NULL, 'l' },
+	{ 0, 0, 0, 0 },
+};
 
-    return item_bucket_node;
-}
-
-static void domain_name_map_insert(char *domain_name, unsigned int ip, unsigned long ttl) {
-    Item_bucket_node *item_bucket_node = domain_name_map_find(domain_name);
-
-    insert_item_node(item_bucket_node, domain_name, ip, ttl);
-}
-
-static Item_bucket_node *ip_map_find(unsigned int ip) {
-    int index = ip % cache_size;
-
-    Item_bucket_node *item_bucket_node = ip_map[index];
-    while (item_bucket_node->next_bucket_node && item_bucket_node->next_bucket_node->item_link 
-        && (ip != item_bucket_node->next_bucket_node->ip)) {
-            item_bucket_node = item_bucket_node->next_bucket_node;
-    }
-
-    return item_bucket_node;
-}
-
-static void ip_map_insert(char *domain_name, unsigned int ip, unsigned long ttl) {
-    Item_bucket_node *item_bucket_node = ip_map_find(ip);
-
-    insert_item_node(item_bucket_node, domain_name, ip, ttl);
-}
-
-//end map operation
+#define OPT_SHORT "?nd:s:p:c:l:"
 
 static void config(int argc, char *argv[]) {
 	char log_fname[1024], config_fname[1024];
-	int   i, opt;
+	int opt;
 
-    /*
-	if (argc < 2) {
+	if (argc < 1) {
 	usage:
-		printf("\nUsage:\n  %s <options> <station-name>\n", argv[0]);
+		printf("\nUsage:\n  %s <options>\n", argv[0]);
 		printf(
 			"\nOptions : \n"
 			"    -?, --help : print this\n"
-			"    -u, --utopia : utopia channel (an error-free channel)\n"
-			"    -f, --flood : flood traffic\n"
-			"    -i, --ibib  : set station B layer 3 sender mode as IDLE-BUSY-IDLE-BUSY-...\n"
-			"    -n, --nolog : do not create log file\n"
-			"    -d, --debug=<0-7>: debug mask (bit0:event, bit1:frame, bit2:warning)\n"
-			"    -p, --port=<port#> : TCP port number (default: %u)\n"
-			"    -b, --ber=<ber> : Bit Error Rate (received data only)\n"
-			"    -l, --log=<filename> : using assigned file as log file\n"
-			"    -t, --ttl=<seconds> : set time-to-live\n"
-			"\n"
-			"i.e.\n"
-			"    %s -fd3 -b 1e-4 A\n"
-			"    %s --flood --debug=3 --ber=1e-4 A\n"
+			"    -n, --nolog : nolog (default: log)\n"
+			"    -d, --debug=<0-2>: debug level (0:basic, 1:info, 2:debug) (default: basic)\n"
+			"    -s, --serverip=<ip#> : DNS server ip number (default: %s)\n"
+			"    -p, --port=<port#> : DNS server port number (default: %u)\n"
+			"    -c, --configfile=<filename> : using assigned file as config file (default: %s)\n"
+			"    -l, --log=<filename> : using assigned file as log file (default: %s)\n"
 			"\n",
-			DEFAULT_PORT, argv[0], argv[0]);
+			DEFAULT_SERVER_IP, DEFAULT_PORT, DEFAULT_CONFIG_FILE, DEFAULT_LOG_FILE);
+		//	"    -t, --ttl=<seconds> : set time-to-live\n"
 		exit(0);
 	}
-    */
 
-#ifdef _WIN32
-	strncpy(log_fname, "log.txt", 10);
-	for (i = 0; i < argc; i++)
-		sprintf(log_fname + strlen(log_fname), "%s ", argv[i]);
-	SetConsoleTitle(log_fname);
-#endif
-	strncpy(log_fname, "log.txt", 10);
+	strncpy(log_fname, DEFAULT_LOG_FILE, 10);
     strncpy(config_fname, DEFAULT_CONFIG_FILE, 20);
     strncpy(server_ip, DEFAULT_SERVER_IP, 20);
     strncpy(dnsserver_ip, DEFAULT_DNSSERVER_IP, 20);
@@ -448,7 +331,7 @@ static void config(int argc, char *argv[]) {
 		switch (opt) {
         //help
 		case '?':
-			//goto usage;
+			goto usage;
 
         //nolog
 		case 'n':
@@ -457,7 +340,7 @@ static void config(int argc, char *argv[]) {
 
         //debug
 		case 'd':
-			debug_mask = atoi(optarg);
+			debug_level = atoi(optarg);
 			break;
 
         //serverip
@@ -465,14 +348,14 @@ static void config(int argc, char *argv[]) {
             strcpy(server_ip, optarg);
 			break;
 
-        //configfile
-		case 'c':
-			strcpy(config_fname, optarg);
-			break;
-
         //port
 		case 'p':
 			port = (unsigned short)atoi(optarg);
+			break;
+
+        //configfile
+		case 'c':
+			strcpy(config_fname, optarg);
 			break;
 
         //log
@@ -481,145 +364,52 @@ static void config(int argc, char *argv[]) {
 			break;
 
 		default:
-			printf("ERROR: Unsupported option\n");
-			//goto usage;
+            break;
 		}
 	}
-
-	if (optind == argc) 
-		//goto usage;
 
 	if (strncmp(log_fname, "nul", 10) == 0)
 		log_file = NULL;
 	else if ((log_file = fopen(log_fname, "w")) == NULL) 
 		printf("WARNING: Failed to create log file \"%s\": %s\n", log_fname, strerror(errno));
-
     if ((config_file = fopen(config_fname, "r")) == NULL) 
 		printf("WARNING: Failed to open config file \"%s\": %s\n", config_fname, strerror(errno));
-
-	printf("src.c, version %s, chunkitlaucont@outlook.com\n", VERSION);
+	printf("main.c, version %s, chunkitlaucont@outlook.com\n", VERSION);
 	printf("Log file \"%s\", Config file \"%s\"\n", log_fname, config_fname);
-	printf("Server ip %s, TCP port %d, debug mask 0x%02x\n", server_ip, port, debug_mask);
+	printf("Server ip %s, port %d, debug level 0x%02x\n", server_ip, port, debug_level);
 }
 
-static char* iphexnum2decstring(unsigned int hex) {
-    for (int k = 0, l = 0; l < 4; ++l) {
-        for (int val = (hex >> ((3 - l) * 8)) & ((1 << 8) - 1), m = 100, flag = 0; m > 0; m = m / 10) {
-            if (val >= m || m == 1 || flag) {
-                ipdecstring[k++] = val / m + '0';
-                val = val % m;
-                flag = 1;
-            }
-        }
-        if (l != 3) {
-            ipdecstring[k++] = '.';
-        }
-        else {
-            ipdecstring[k++] = 0;
-        }
+static void lprintf(char *string, unsigned char *buffer, int buffer_size) {
+    printf("%s", string);
+    for (int k = 0; k < buffer_size; ++k) {
+        printf("%x ", buffer[k]);
     }
-    return ipdecstring;
+    printf("\n");
 }
 
-static void server_test(int domain_name_to_ip, int use_file) {
-    FILE *input_file = fopen("input.txt", "r");
-    FILE *output_file = fopen("output.txt", "w");
-    char domain_name[DOMAIN_NAME_SIZE];
-    unsigned int ip_part1, ip_part2, ip_part3, ip_part4;
+static void network_init() {
+    socket_init();
 
-    while (1) {
-        if (domain_name_to_ip) {
-            if (!use_file) {
-                printf("please input a domain name\n");
-                scanf("%s", domain_name);
-            }
-            else {
-                if (fscanf(input_file,"%s",domain_name) == EOF) {
-                    break;
-                }
-                fscanf(input_file,"%s",domain_name);
-            }
-        }
-        else {
-            if (!use_file) {
-                printf("please input an ip\n");
-                scanf("%u.%u.%u.%u", &ip_part1, &ip_part2, &ip_part3, &ip_part4);
-            }
-            else {
-                if (fscanf(input_file,"%u.%u.%u.%u", &ip_part1, &ip_part2, &ip_part3, &ip_part4) == EOF) {
-                    break;
-                }
-                fscanf(input_file,"%s",domain_name);
-            }
-        }
-        
-        unsigned int ip = (ip_part1 << 24) + (ip_part2 << 16) + (ip_part3 << 8) + ip_part4;
+    memset(&dnsserver_addr, 0, sizeof(dnsserver_addr));
+    dnsserver_addr.sin_family = AF_INET;
+    dnsserver_addr.sin_addr.s_addr = inet_addr(dnsserver_ip);
+    dnsserver_addr.sin_port = htons(port);
 
-        Item_bucket_node *item_bucket_node;
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    //server_addr.sin_addr.s_addr = inet_addr(server_ip);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(port);
 
-        if (domain_name_to_ip) {
-            item_bucket_node = domain_name_map_find(domain_name);
-        }
-        else {
-            item_bucket_node = ip_map_find(ip);
-        }
-        
-        if (!item_bucket_node || !item_bucket_node->next_bucket_node || 
-            !item_bucket_node->next_bucket_node->item_link || 
-            !item_bucket_node->next_bucket_node->item_link->next_item_node ||
-            (WEBSITE_BLOCKING_OPTION && domain_name_to_ip && !item_bucket_node->next_bucket_node->item_link->next_item_node->ip)) {
-            if (domain_name_to_ip) {
-                if (!use_file) {
-                    printf("domain name %s does not exist\n", domain_name);
-                }
-                else {
-                    fprintf(output_file, "domain name %s does not exist\n", domain_name);
-                }
-            }
-            else {
-                if (!use_file) {
-                    printf("ip %s does not exist\n", iphexnum2decstring(ip));
-                }
-                else {
-                    fprintf(output_file, "ip %s does not exist\n", iphexnum2decstring(ip));
-                }
-            }
-        }
-        else {
-            if (domain_name_to_ip) {
-                if (!use_file) {
-                    printf("IP of resolved domain name %s:\n", domain_name);
-                }
-            }
-            else {
-                if (!use_file) {
-                    printf("domain name of resolved ip %s:\n", iphexnum2decstring(ip));
-                }
-            }
-            
-            Item_node *item_node = item_bucket_node->next_bucket_node->item_link;
-            while (item_node->next_item_node) {
-                if (domain_name_to_ip) {
-                    if (!use_file) {
-                        printf("%s\n", iphexnum2decstring(item_node->next_item_node->ip));
-                    }
-                    else {
-                        fprintf(output_file, "%s %s\n", iphexnum2decstring(item_node->next_item_node->ip), item_node->next_item_node->domain_name);
-                    }
-                }
-                else {
-                    if (!use_file) {
-                        printf("%s\n", item_node->next_item_node->domain_name);
-                    }
-                    else {
-                        fprintf(output_file, "%s %s\n", iphexnum2decstring(item_node->next_item_node->ip), item_node->next_item_node->domain_name);
-                    }
-                }
-                
-                item_node = item_node->next_item_node;
-            }
-        }
-    }
+    server_sock = socket(AF_INET, SOCK_DGRAM, 0);
+    const char REUSE=1;
+    setsockopt(server_sock, SOL_SOCKET, SO_REUSEADDR, &REUSE, sizeof(REUSE));
+
+    if (server_sock < 0) printf("ret: Failed to create socket: %s\n", strerror(errno));
+    if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+        printf("ret: Failed to bind port %u: %s\n", port, strerror(errno));
+    printf("DNS server IP: %s , Listening on port %u\n", server_ip, port);
 }
 
 static void decode_header(struct Header *header) {
@@ -643,46 +433,39 @@ static unsigned int form_standard_response(unsigned char *buffer, char *domain_n
     Header *header = (Header *)buffer;
     header->id = 0;
     header->qr = 1;
-    header->opcode = 0;
-    header->aa = 0;
-    header->tc = 0;
-    header->rd = 1;
-    header->ra = 1;
-    header->z = 0;
-    header->ad = 0;
-    header->cd = 0;
+    header->opcode = header->aa = header->tc = 0;
+    header->rd = header->ra = 1;
+    header->z = header->ad = header->cd = 0;
     if (ip) {
-        header->opcode = 0;
+        header->rcode = 0;
         header->ancount = 1;
     }
     else {
-        header->opcode = 3;
+        header->rcode = 3;
         header->ancount = 0;
     }
     header->qdcount = 1;
-    header->nscount = 0;
-    header->arcount = 0;
+    header->nscount = header->arcount = 0;
     encode_header(header);
 
     // Question
     unsigned int domain_name_size = strlen(domain_name);
     unsigned char *qname = (unsigned char *)(buffer + 12);
     *qname = 0;
-    for (int k = 0; k <= domain_name_size; ++k) {
-        if (domain_name[k] != '.' && !domain_name[k]) {
-            *(qname + k + 1) = domain_name[k];
+    for (int k = 0, l = 1; k <= domain_name_size; ++k, ++l) {
+        if (domain_name[k] != '.' && domain_name[k]) {
+            *(qname + l) = domain_name[k];
             ++(*qname);
         }
         else {
             qname += (*qname) + 1;
-            *qname = 0;
+            *qname = l = 0;
         }
     }
     unsigned short *qtype = (unsigned short *)(qname + 1);
     *qtype = htons(1);
     unsigned short *qclass = qtype + 1;
     *qclass = htons(1);
-
     *question_size = (unsigned char *)(qclass + 1) - buffer;
     if (!ip) {
         return *question_size;
@@ -695,9 +478,9 @@ static unsigned int form_standard_response(unsigned char *buffer, char *domain_n
     *type = htons(1);
     unsigned short *class = type + 1;
     *class = htons(1);
-    unsigned short *ttl = class + 1;
-    *ttl = htons(DEFAULT_TTL);
-    unsigned short *rdlength = ttl + 1;
+    unsigned long *ttl = (unsigned long *)(class + 1);
+    *ttl = htonl(DEFAULT_TTL);
+    unsigned short *rdlength = (unsigned short *)(ttl + 1);
     *rdlength = htons(4);
     unsigned int *rdata = (unsigned int *)(rdlength + 1);
     *rdata = htonl(ip);
@@ -708,148 +491,120 @@ static unsigned int form_standard_response(unsigned char *buffer, char *domain_n
 static void load_config_file() {
     unsigned int ip_part1, ip_part2, ip_part3, ip_part4;
     char domain_name[DOMAIN_NAME_SIZE];
-    
-    domain_name_map = new_item_bucket_array(cache_size);
-    ip_map = new_item_bucket_array(cache_size);
+    unsigned char buffer[BUFFER_SIZE];
 
     while (fscanf(config_file,"%u.%u.%u.%u %s\n", &ip_part1, &ip_part2, &ip_part3, &ip_part4, domain_name) != EOF) {
         unsigned int ip = (ip_part1 << 24) + (ip_part2 << 16) + (ip_part3 << 8) + ip_part4;
 
-        unsigned char buffer[BUFFER_SIZE];
-        unsigned int question_size;
-        unsigned int buffer_size = form_standard_response(buffer, domain_name, ip, &question_size);
+        unsigned int question_size, buffer_size = form_standard_response(buffer, domain_name, ip, &question_size);
         Message *message = new_message(buffer, buffer_size, question_size, ULONG_MAX);
+        if (debug_level) printf("Info: insert message {domain name: %s, ip: %u.%u.%u.%u} to hash map", domain_name, ip_part1, ip_part2, ip_part3, ip_part4);
+        if (debug_level > 1) {
+            printf("Debug: insert message to hash map, hash is %d, at %x\n", message->hash, message);
+            lprintf("Debug: message --- ", message->buffer, message->buffer_size);
+        }
         message_map_insert(message);
-
-        domain_name_map_insert(domain_name, ip, ULONG_MAX);
-        ip_map_insert(domain_name, ip, ULONG_MAX);
     }
 
-    printf("Config file loaded\n");
-}
-
-static void init_socket() {
-    memset(&dnsserver_addr, 0, sizeof(dnsserver_addr));
-    dnsserver_addr.sin_family = AF_INET;
-    dnsserver_addr.sin_addr.s_addr = inet_addr(dnsserver_ip);
-    dnsserver_addr.sin_port = htons(port);
-
-    struct sockaddr_in server_addr;
-    
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = inet_addr(server_ip);
-    server_addr.sin_port = htons(port);
-
-    server_sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (server_sock < 0) {
-        printf("ERROR: Failed to create socket: %s\n", strerror(errno));
-    }
-    if (bind(server_sock, (struct sockaddr *)&server_addr, sockaddr_in_size) < 0) {
-        printf("ERROR: Failed to bind port %u: %s\n", port, strerror(errno));
-    }
-
-    printf("DNS server IP: %s\n", server_ip);
-    printf("Listening on port %u\n", port);    
-}
-
-static void message_map_insert(Message *message) {
-    
-}
-
-static Message *message_map_find(char *domain_name) {
-    return NULL;
-}
-
-static unsigned int client_map_insert(Client *client) {
-
-    //return new_id;
-}
-
-static int client_map_find(unsigned int *id, struct sockaddr_in *client_addr) {
-
-    //*id = new_id;
+    printf("Static domain name - ip config file loaded\n");
 }
 
 int main(int argc, char *argv[]) {
     printf("DNS Relay Server ---- Designed by Liu Junjie, build: 2021\n");
     
     config(argc, argv);
+    network_init();
+    for (int k = 0; k < 12; ++k) hash_ignore[k]= 1;
+    new_message_map();
     load_config_file();
-    init_socket();
 
-    int n_bytes = 0;
+    int n_bytes = 0, ret = 0;
     unsigned char buffer[BUFFER_SIZE];
     struct sockaddr_in client_addr;
+    socklen_t sockaddr_in_size = sizeof(client_addr);
     struct Header *header;
 
     while (1) {
-        //header->qr = 1;
-        //header->ra = 1;
-        //query ignore id flag = 0 expect rd=1 q=1
         n_bytes = recvfrom(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&client_addr, &sockaddr_in_size);
         if (n_bytes < HEADER_SIZE) {
-            printf("receive a broken dns message\n");
+            printf("ret: recvfrom ret with return %d, WSAGetLastError %d\n", n_bytes, WSAGetLastError());
             continue;
         }
+        lprintf("\nInfo: received data --- ", buffer, n_bytes);
 
         header = (struct Header *)buffer;
         decode_header(header);
+        unsigned qr = header->qr, id = header->id;
+        encode_header(header);
 
-        if (header->qr == QUERY_MESSAGE) {
-            printf("receive a query message\n");
-            if (!header->qdcount) {
-                printf("receive an error query message\n");
-                continue;
-            }
+        if (qr == QUERY_MESSAGE) {
+            if (debug_level) printf("Info: It's a query message\n");
 
-            char qname[DOMAIN_NAME_SIZE];
-            qname[0] = 0;
-            unsigned int qtype = 0, qclass = 0;
-            if (header->qdcount == 1) {
-                resolve_question(qname, &qtype, &qclass, buffer);
+            Message *message = new_message(buffer, n_bytes, n_bytes, ULONG_MAX);
+            if (debug_level > 1) printf("Debug: message hash value is %u\n", message->hash);
+            Message_node *message_node = message_map_find(message)->next_message_node;
+
+            if (message_node) {
+                if (debug_level) printf("Info: found local record\n");
+                if (debug_level > 1) printf("Debug: found local record message_node at %x, message at %x\n", message_node, message_node->message);
+                
+                header = (struct Header *)(message_node->message->buffer);
+                decode_header(header);
+                header->id = id;
+                encode_header(header);
+
+                if (debug_level) lprintf("Info: send local record to client --- ", message_node->message->buffer, message_node->message->buffer_size);
+                ret = sendto(server_sock, message_node->message->buffer, message_node->message->buffer_size, 0, (struct sockaddr *)&client_addr, sockaddr_in_size);
             }
             else {
-                Client *client = new_client(header->id, client_addr);
-                header->id = client_map_insert(client);
-                sendto(server_sock, buffer, n_bytes, 0, (struct sockaddr *)&dnsserver_addr, &sockaddr_in_size);
-                continue;
-            }
+                if (debug_level) printf("Info: can't found local record, ask remote dns server\n");
 
-            if (header->opcode == STANDARD_QUERY) {
-                printf("receive a standard query\n");
-                Message *message = message_map_find(qname);
-                if (message) {
-                    sendto(server_sock, message->buffer, message->buffer_size, 0, (struct sockaddr *)&client_addr, &sockaddr_in_size);
-                }
-                else {
-                    Client *client = new_client(header->id, client_addr);
-                    header->id = client_map_insert(client);
-                    sendto(server_sock, buffer, n_bytes, 0, (struct sockaddr *)&dnsserver_addr, &sockaddr_in_size);
-                }
-            }
-            else if (header->opcode == REVERSE_QUERY) {
-                printf("receive a reverse query\n");
-                //to be done, now relay instead
-                Client *client = new_client(header->id, client_addr);
-                header->id = client_map_insert(client);
-                sendto(server_sock, buffer, n_bytes, 0, (struct sockaddr *)&dnsserver_addr, &sockaddr_in_size);
+                Client *client = new_client(id, client_addr, n_bytes);
+                decode_header(header);
+                header->id = client_queue_push(client);
+                if (debug_level > 1)  printf("Debug: assign outsend id %u to {id: %d, ip: %s, port: %x }\n", 
+                                            header->id, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+                encode_header(header);
+
+                if (debug_level) lprintf("Info: send request to remote dns server --- ", buffer, n_bytes);
+                ret = sendto(server_sock, buffer, n_bytes, 0, (struct sockaddr *)&dnsserver_addr, sockaddr_in_size);
             }
         }
-        else if (header->qr == RESPONSE_MESSAGE) {
-            printf("receive a response message\n");
-            int error = client_map_find(&(header->id), &client_addr);
-            if (!error) {
-                sendto(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr *)&client_addr, &sockaddr_in_size);
+        else if (qr == RESPONSE_MESSAGE) {
+            if (debug_level) printf("Info: It's a response message\n");
+
+            Client *client = client_queue_find(id);
+
+            if (client) {
+                if (debug_level) printf("Info: message id is valid, found correspond client, cache this message\n");
+
+                Message *message = new_message(buffer, n_bytes, client->question_size, ULONG_MAX);
+                message_map_insert(message);
+                if (debug_level > 1) {
+                    printf("Debug: found correspond record of id %u to {id: %d, ip: %s, port: %x }\n", 
+                        id, inet_ntoa(client->client_addr.sin_addr), ntohs(client->client_addr.sin_port));
+                    printf("Debug: cache message hash is %u, message at %x\n", message->hash, message);
+                }
+
+                decode_header(header);
+                header->id = client->id;
+                encode_header(header);
+
+                if (debug_level) lprintf("Info: send remote dns server record to client --- ", buffer, n_bytes);
+                ret = sendto(server_sock, buffer, n_bytes, 0, (struct sockaddr *)&(client->client_addr), sockaddr_in_size);
             }
             else {
-                printf("can't find client ip of id %x\n", header->id);
+                if (debug_level) printf("Info: message id is invalid, ignore this message\n");
+                if (debug_level > 1) printf("message id %x\n", id);
             }
         }
+        if (ret < 0) printf("ret: sendto ret with return %d, WSAGetLastError %d\n", ret, WSAGetLastError());
     }
     
     close(server_sock);
-    delete_item_bucket_array(domain_name_map, cache_size);
-    delete_item_bucket_array(ip_map, cache_size);
+    delete_message_map();
     return 0;
 }
+
+// sudo vim /etc/resolv.conf
+// gcc main.c -o main -g -lws2_32
