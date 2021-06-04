@@ -20,9 +20,7 @@ static void socket_init(void) {
 static FILE *log_file = NULL;
 static FILE *config_file = NULL;
 
-
 #define OPT_SHORT "?nd:s:p:c:l:"
-
 static struct option intopts[] = {
 	{ "help",	no_argument, NULL, '?' },
 	{ "nolog",  no_argument, NULL, 'n' },
@@ -158,7 +156,7 @@ static void load_config_file() {
         Message *message = new_message(buffer, buffer_size, question_size, ULONG_MAX);
         if (debug_level) fprintf(log_file, "Info: insert message {domain name: %s, ip: %u.%u.%u.%u} to hash map\n", domain_name, ip_part1, ip_part2, ip_part3, ip_part4);
         if (debug_level > 1) {
-            fprintf(log_file, "Debug: insert message to hash map, hash is %d, at %x\n", message->hash, message);
+            fprintf(log_file, "Debug: insert message to hash map, hash is %d, at %p\n", message->hash, message);
             lprintf("Debug: message --- ", message->buffer, message->buffer_size);
         }
         message_map_insert(message);
@@ -197,13 +195,15 @@ int main(int argc, char *argv[]) {
         if (qr == QUERY_MESSAGE) {
             if (debug_level) fprintf(log_file, "Info: It's a query message\n");
 
-            Message *message = new_message(buffer, n_bytes, n_bytes, ULONG_MAX);
+            Message *message = new_message(buffer, n_bytes, n_bytes, 0);
             if (debug_level > 1) fprintf(log_file, "Debug: message hash value is %u\n", message->hash);
             Message_node *message_node = message_map_find(message)->next_message_node;
+            delete_message(message);
+            //if (!message_valid(message_node->message)) message_node = NULL;
 
             if (message_node) {
                 if (debug_level) fprintf(log_file, "Info: found local record\n");
-                if (debug_level > 1) fprintf(log_file, "Debug: found local record message_node at %x, message at %x\n", message_node, message_node->message);
+                if (debug_level > 1) fprintf(log_file, "Debug: found local record message_node at %p, message at %p\n", message_node, message_node->message);
                 
                 header = (struct Header *)(message_node->message->buffer);
                 decode_header(header);
@@ -219,8 +219,8 @@ int main(int argc, char *argv[]) {
                 Client *client = new_client(id, client_addr, n_bytes);
                 decode_header(header);
                 header->id = client_queue_push(client);
-                if (debug_level > 1)  fprintf(log_file, "Debug: assign outsend id %u to {id: %d, ip: %s, port: %x }\n", 
-                                            header->id, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+                if (debug_level > 1)  fprintf(log_file, "Debug: assign outsend id %u to {id: %u, ip: %s, port: %x }\n", 
+                                        id, (unsigned int)header->id, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
                 encode_header(header);
 
                 if (debug_level) lprintf("Info: send request to remote dns server --- ", buffer, n_bytes);
@@ -235,12 +235,12 @@ int main(int argc, char *argv[]) {
             if (client) {
                 if (debug_level) fprintf(log_file, "Info: message id is valid, found correspond client, cache this message\n");
 
-                Message *message = new_message(buffer, n_bytes, client->question_size, ULONG_MAX);
+                Message *message = new_message(buffer, n_bytes, client->question_size, ULONG_MAX - 1);
                 message_map_insert(message);
                 if (debug_level > 1) {
-                    fprintf(log_file, "Debug: found correspond record of id %u to {id: %d, ip: %s, port: %x }\n", 
-                        id, inet_ntoa(client->client_addr.sin_addr), ntohs(client->client_addr.sin_port));
-                    fprintf(log_file, "Debug: cache message hash is %u, message at %x\n", message->hash, message);
+                    fprintf(log_file, "Debug: found correspond record of id %u to {id: %u, ip: %s, port: %u }\n", 
+                        id, client->id, inet_ntoa(client->client_addr.sin_addr), ntohs(client->client_addr.sin_port));
+                    fprintf(log_file, "Debug: cache message hash is %u, message at %p\n", message->hash, message);
                 }
 
                 decode_header(header);
@@ -264,4 +264,5 @@ int main(int argc, char *argv[]) {
 }
 
 // sudo vim /etc/resolv.conf
-// gcc main.c protocol.c message.c client.c  -o main -g -lws2_32
+// win: gcc main.c protocol.c message.c client.c  -o main -g -lws2_32
+// linux: gcc main.c protocol.c message.c client.c  -o main -g

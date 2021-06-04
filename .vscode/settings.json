@@ -17,7 +17,8 @@
         "message.h": "c",
         "client.h": "c",
         "protocol.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "errno.h": "c"
     },
     "C_Cpp.default.intelliSenseMode": "windows-gcc-x64"
 }

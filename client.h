@@ -28,6 +28,7 @@ static void socket_init(void);
 #include <unistd.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <getopt.h>
 #include <arpa/inet.h>
@@ -35,6 +36,7 @@ static void socket_init(void);
 #include <netdb.h>
 #define stricmp strcasecmp
 #define socket_init()
+#define WSAGetLastError() 0
 
 #endif
 

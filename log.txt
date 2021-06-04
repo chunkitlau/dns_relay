@@ -462,65 +462,100 @@ Info: insert message {domain name: h253, ip: 192.168.0.253} to hash map
 Info: insert message {domain name: h254, ip: 192.168.0.254} to hash map
 Info: insert message {domain name: h255, ip: 192.168.0.255} to hash map
 
-Info: received data --- 4 99 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+Info: received data --- 5a f0 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
 Info: It's a query message
 Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 0 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+Info: send request to remote dns server --- 0 0 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
 
-Info: received data --- 9b 50 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: received data --- 3e 65 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
 Info: It's a query message
 Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 1 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: send request to remote dns server --- 0 1 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
 
-Info: received data --- 0 0 81 80 0 1 0 2 0 0 0 1 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 7 3a 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 1 0 1 0 0 0 2f 0 4 6f dd 1d fe 9 63 61 69 73 68 69 6b 6f 75 8 72 65 64 69 72 65 63 74 0 0 1 0 1 0 0 e 10 0 4 7f 0 0 1 
+Info: received data --- 3e 65 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 2 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
+
+Info: received data --- 0 2 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
 Info: It's a response message
 Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 4 99 81 80 0 1 0 2 0 0 0 1 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 7 3a 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 1 0 1 0 0 0 2f 0 4 6f dd 1d fe 9 63 61 69 73 68 69 6b 6f 75 8 72 65 64 69 72 65 63 74 0 0 1 0 1 0 0 e 10 0 4 7f 0 0 1 
+Info: send remote dns server record to client --- 3e 65 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
 
-Info: received data --- 0 0 81 80 0 1 0 3 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 6a 0 1 0 1 0 0 0 20 0 4 6f dd 1d fe 
+Info: received data --- 5a f0 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 3 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+
+Info: received data --- 5e 8 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 4 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+
+Info: received data --- 17 be 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 5 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+
+Info: received data --- 0 4 81 80 0 1 0 3 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 3 62 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 6a 0 1 0 1 0 0 0 20 0 4 6f dd 1d fe 
 Info: It's a response message
 Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 4 99 81 80 0 1 0 3 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 6a 0 1 0 1 0 0 0 20 0 4 6f dd 1d fe 
+Info: send remote dns server record to client --- 5e 8 81 80 0 1 0 3 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 3 62 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 6a 0 1 0 1 0 0 0 20 0 4 6f dd 1d fe 
 
-Info: received data --- 0 1 81 80 0 1 0 2 0 1 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 4a 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 22 a 68 6f 73 74 6d 61 73 74 65 72 c0 4a 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+Info: received data --- 0 5 81 80 0 1 0 2 0 1 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 3 61 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 4a 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 22 a 68 6f 73 74 6d 61 73 74 65 72 c0 4a 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
 Info: It's a response message
 Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 9b 50 81 80 0 1 0 2 0 1 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 4a 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 22 a 68 6f 73 74 6d 61 73 74 65 72 c0 4a 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+Info: send remote dns server record to client --- 17 be 81 80 0 1 0 2 0 1 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 3 61 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 4a 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 22 a 68 6f 73 74 6d 61 73 74 65 72 c0 4a 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+
+Info: received data --- b0 33 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 6 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+
+Info: received data --- eb 2a 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 7 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+
+Info: received data --- b0 33 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 8 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+
+Info: received data --- eb 2a 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 9 1 0 0 1 0 0 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+
+Info: received data --- 0 6 81 80 0 1 0 3 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 2 66 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 26 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 6d 0 1 0 1 0 0 0 20 0 4 8a 5b 88 6c 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- b0 33 81 80 0 1 0 3 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 2 66 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 26 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 6d 0 1 0 1 0 0 0 20 0 4 8a 5b 88 6c 
+
+Info: received data --- 0 7 81 80 0 1 0 2 0 1 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 2 65 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 20 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 82 0 6 0 1 0 0 0 20 0 33 4 70 72 64 31 e 61 7a 75 72 65 64 6e 73 2d 63 6c 6f 75 64 c0 5c 6 6d 73 6e 68 73 74 c0 1d 7d a3 fc 3c 0 0 3 84 0 0 1 2c 0 9 3a 80 0 0 0 3c 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- eb 2a 81 80 0 1 0 2 0 1 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 2 65 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 20 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 82 0 6 0 1 0 0 0 20 0 33 4 70 72 64 31 e 61 7a 75 72 65 64 6e 73 2d 63 6c 6f 75 64 c0 5c 6 6d 73 6e 68 73 74 c0 1d 7d a3 fc 3c 0 0 3 84 0 0 1 2c 0 9 3a 80 0 0 0 3c 
+
+Info: received data --- 0 8 81 80 0 1 0 3 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 2 65 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 25 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 6d 0 1 0 1 0 0 0 20 0 4 8a 5b 88 6c 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- b0 33 81 80 0 1 0 3 0 0 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 2 65 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 25 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 6d 0 1 0 1 0 0 0 20 0 4 8a 5b 88 6c 
+
+Info: received data --- 0 9 81 80 0 1 0 2 0 1 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 2 64 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 24 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 82 0 6 0 1 0 0 0 2a 0 33 4 70 72 64 31 e 61 7a 75 72 65 64 6e 73 2d 63 6c 6f 75 64 c0 5c 6 6d 73 6e 68 73 74 c0 1d 7d a3 fc 3c 0 0 3 84 0 0 1 2c 0 9 3a 80 0 0 0 3c 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- eb 2a 81 80 0 1 0 2 0 1 0 0 4 73 65 6c 66 6 65 76 65 6e 74 73 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 2 64 0 25 10 73 65 6c 66 2d 65 76 65 6e 74 73 2d 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 3c 0 5 0 1 0 0 0 24 0 20 14 73 6b 79 70 65 64 61 74 61 70 72 64 63 6f 6c 77 75 73 31 32 8 63 6c 6f 75 64 61 70 70 c0 5c c0 82 0 6 0 1 0 0 0 2a 0 33 4 70 72 64 31 e 61 7a 75 72 65 64 6e 73 2d 63 6c 6f 75 64 c0 5c 6 6d 73 6e 68 73 74 c0 1d 7d a3 fc 3c 0 0 3 84 0 0 1 2c 0 9 3a 80 0 0 0 3c 
 
 Info: received data --- 0 1 1 0 0 1 0 0 0 0 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 
 Info: It's a query message
 Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 2 1 0 0 1 0 0 0 0 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 
+Info: send request to remote dns server --- 0 a 1 0 0 1 0 0 0 0 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 
 
-Info: received data --- 0 2 85 83 0 1 0 0 0 1 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 c0 12 0 6 0 1 0 1 51 37 0 17 c0 12 0 0 0 0 0 0 0 70 80 0 0 1c 20 0 9 3a 80 0 1 51 80 
+Info: received data --- 0 a 85 83 0 1 0 0 0 1 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 c0 12 0 6 0 1 0 1 4f a6 0 17 c0 12 0 0 0 0 0 0 0 70 80 0 0 1c 20 0 9 3a 80 0 1 51 80 
 Info: It's a response message
 Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 0 1 85 83 0 1 0 0 0 1 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 c0 12 0 6 0 1 0 1 51 37 0 17 c0 12 0 0 0 0 0 0 0 70 80 0 0 1c 20 0 9 3a 80 0 1 51 80 
-
-Info: received data --- 0 2 1 0 0 1 0 0 0 0 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 3 1 0 0 1 0 0 0 0 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1 0 1 
-
-Info: received data --- 0 3 81 80 0 1 0 3 0 0 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 0 d4 0 f 3 77 77 77 1 61 6 73 68 69 66 65 6e c0 16 c0 2b 0 1 0 1 0 0 0 5e 0 4 27 9c 42 e c0 2b 0 1 0 1 0 0 0 5e 0 4 27 9c 42 12 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 0 2 81 80 0 1 0 3 0 0 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 0 d4 0 f 3 77 77 77 1 61 6 73 68 69 66 65 6e c0 16 c0 2b 0 1 0 1 0 0 0 5e 0 4 27 9c 42 e c0 2b 0 1 0 1 0 0 0 5e 0 4 27 9c 42 12 
-
-Info: received data --- 0 3 1 0 0 1 0 0 0 0 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1c 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 4 1 0 0 1 0 0 0 0 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1c 0 1 
-
-Info: received data --- 0 4 81 80 0 1 0 1 0 1 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 0 d4 0 f 3 77 77 77 1 61 6 73 68 69 66 65 6e c0 16 c0 2f 0 6 0 1 0 0 2 1a 0 2d 3 6e 73 31 c0 2f 10 62 61 69 64 75 5f 64 6e 73 5f 6d 61 73 74 65 72 c0 10 7d 87 9e d8 0 0 0 5 0 0 0 5 0 27 8d 0 0 0 e 10 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 0 3 81 80 0 1 0 1 0 1 0 0 3 77 77 77 5 62 61 69 64 75 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 0 d4 0 f 3 77 77 77 1 61 6 73 68 69 66 65 6e c0 16 c0 2f 0 6 0 1 0 0 2 1a 0 2d 3 6e 73 31 c0 2f 10 62 61 69 64 75 5f 64 6e 73 5f 6d 61 73 74 65 72 c0 10 7d 87 9e d8 0 0 0 5 0 0 0 5 0 27 8d 0 0 0 e 10 
-
-Info: received data --- 0 1 1 0 0 1 0 0 0 0 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 
-Info: It's a query message
-Info: found local record
-Info: send local record to client --- 0 1 85 83 0 1 0 0 0 1 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 c0 12 0 6 0 1 0 1 51 37 0 17 c0 12 0 0 0 0 0 0 0 70 80 0 0 1c 20 0 9 3a 80 0 1 51 80 
+Info: send remote dns server record to client --- 0 1 85 83 0 1 0 0 0 1 0 0 1 31 1 30 1 30 3 31 32 37 7 69 6e 2d 61 64 64 72 4 61 72 70 61 0 0 c 0 1 c0 12 0 6 0 1 0 1 4f a6 0 17 c0 12 0 0 0 0 0 0 0 70 80 0 0 1c 20 0 9 3a 80 0 1 51 80 
 
 Info: received data --- 0 2 1 0 0 1 0 0 0 0 0 0 5 74 65 73 74 31 0 0 1 0 1 
 Info: It's a query message
@@ -530,104 +565,104 @@ Info: send local record to client --- 0 2 81 80 0 1 0 1 0 0 0 0 5 74 65 73 74 31
 Info: received data --- 0 3 1 0 0 1 0 0 0 0 0 0 5 74 65 73 74 31 0 0 1c 0 1 
 Info: It's a query message
 Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 5 1 0 0 1 0 0 0 0 0 0 5 74 65 73 74 31 0 0 1c 0 1 
+Info: send request to remote dns server --- 0 b 1 0 0 1 0 0 0 0 0 0 5 74 65 73 74 31 0 0 1c 0 1 
 
-Info: received data --- 0 5 81 83 0 1 0 0 0 1 0 0 5 74 65 73 74 31 0 0 1c 0 1 0 0 6 0 1 0 0 0 20 0 40 1 61 c 72 6f 6f 74 2d 73 65 72 76 65 72 73 3 6e 65 74 0 5 6e 73 74 6c 64 c 76 65 72 69 73 69 67 6e 2d 67 72 73 3 63 6f 6d 0 78 76 ef 30 0 0 7 8 0 0 3 84 0 9 3a 80 0 1 51 80 
+Info: received data --- 0 b 81 83 0 1 0 0 0 1 0 0 5 74 65 73 74 31 0 0 1c 0 1 0 0 6 0 1 0 0 9 88 0 40 1 61 c 72 6f 6f 74 2d 73 65 72 76 65 72 73 3 6e 65 74 0 5 6e 73 74 6c 64 c 76 65 72 69 73 69 67 6e 2d 67 72 73 3 63 6f 6d 0 78 76 ef 30 0 0 7 8 0 0 3 84 0 9 3a 80 0 1 51 80 
 Info: It's a response message
 Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 0 3 81 83 0 1 0 0 0 1 0 0 5 74 65 73 74 31 0 0 1c 0 1 0 0 6 0 1 0 0 0 20 0 40 1 61 c 72 6f 6f 74 2d 73 65 72 76 65 72 73 3 6e 65 74 0 5 6e 73 74 6c 64 c 76 65 72 69 73 69 67 6e 2d 67 72 73 3 63 6f 6d 0 78 76 ef 30 0 0 7 8 0 0 3 84 0 9 3a 80 0 1 51 80 
+Info: send remote dns server record to client --- 0 3 81 83 0 1 0 0 0 1 0 0 5 74 65 73 74 31 0 0 1c 0 1 0 0 6 0 1 0 0 9 88 0 40 1 61 c 72 6f 6f 74 2d 73 65 72 76 65 72 73 3 6e 65 74 0 5 6e 73 74 6c 64 c 76 65 72 69 73 69 67 6e 2d 67 72 73 3 63 6f 6d 0 78 76 ef 30 0 0 7 8 0 0 3 84 0 9 3a 80 0 1 51 80 
 
-Info: received data --- 3b 15 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: received data --- 43 84 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 c 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+
+Info: received data --- 43 84 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 d 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+
+Info: received data --- 0 d 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 43 84 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+
+Info: received data --- 9c bc 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 e 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 
+
+Info: received data --- 67 d9 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 f 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 
+
+Info: received data --- 67 d9 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 10 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 
+
+Info: received data --- 9c bc 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 
+Info: It's a query message
+Info: can't found local record, ask remote dns server
+Info: send request to remote dns server --- 0 11 1 0 0 1 0 0 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 
+
+Info: received data --- 0 e 81 80 0 1 0 3 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 5f 0 1 0 1 0 0 0 e0 0 4 34 8b fa fd 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 9c bc 81 80 0 1 0 3 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 5f 0 1 0 1 0 0 0 e0 0 4 34 8b fa fd 
+
+Info: received data --- 0 f 81 80 0 1 0 2 0 1 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 3f 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 1f a 68 6f 73 74 6d 61 73 74 65 72 c0 3f 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 67 d9 81 80 0 1 0 2 0 1 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 3f 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 1f a 68 6f 73 74 6d 61 73 74 65 72 c0 3f 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+
+Info: received data --- 0 10 81 80 0 1 0 2 0 1 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 3f 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 1f a 68 6f 73 74 6d 61 73 74 65 72 c0 3f 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 67 d9 81 80 0 1 0 2 0 1 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 3f 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 1f a 68 6f 73 74 6d 61 73 74 65 72 c0 3f 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+
+Info: received data --- 0 11 81 80 0 1 0 3 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 5f 0 1 0 1 0 0 0 e0 0 4 34 8b fa fd 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 9c bc 81 80 0 1 0 3 0 0 0 0 6 63 6c 69 65 6e 74 3 77 6e 73 7 77 69 6e 64 6f 77 73 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 6 4 0 1f 3 77 6e 73 6 6e 6f 74 69 66 79 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 34 0 5 0 1 0 0 0 de 0 c 9 76 69 70 31 2d 73 67 32 70 c0 34 c0 5f 0 1 0 1 0 0 0 e0 0 4 34 8b fa fd 
+
+Info: received data --- 0 3 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 5a f0 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+
+Info: received data --- 0 0 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 5a f0 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+
+Info: received data --- 0 c 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 43 84 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
+
+Info: received data --- 0 1 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
+Info: It's a response message
+Info: message id is valid, found correspond client, cache this message
+Info: send remote dns server record to client --- 3e 65 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
+
+Info: received data --- 8f 93 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
 Info: It's a query message
 Info: found local record
-Info: send local record to client --- 3b 15 81 80 0 1 0 2 0 1 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 4a 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 22 a 68 6f 73 74 6d 61 73 74 65 72 c0 4a 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+Info: send local record to client --- 8f 93 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
 
-Info: received data --- 99 3c 1 0 0 1 0 0 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 6 1 0 0 1 0 0 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1 0 1 
-
-Info: received data --- d6 aa 1 0 0 1 0 0 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1c 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 7 1 0 0 1 0 0 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1c 0 1 
-
-Info: received data --- 0 6 81 80 0 1 0 2 0 0 0 1 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1 0 1 c0 c 0 1 0 1 0 0 0 3c 0 4 ac 43 c0 56 c0 c 0 1 0 1 0 0 0 3c 0 4 68 15 14 68 9 63 61 69 73 68 69 6b 6f 75 8 72 65 64 69 72 65 63 74 0 0 1 0 1 0 0 e 10 0 4 7f 0 0 1 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 99 3c 81 80 0 1 0 2 0 0 0 1 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1 0 1 c0 c 0 1 0 1 0 0 0 3c 0 4 ac 43 c0 56 c0 c 0 1 0 1 0 0 0 3c 0 4 68 15 14 68 9 63 61 69 73 68 69 6b 6f 75 8 72 65 64 69 72 65 63 74 0 0 1 0 1 0 0 e 10 0 4 7f 0 0 1 
-
-Info: received data --- 0 6 81 80 0 1 0 2 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1 0 1 c0 c 0 1 0 1 0 0 1 1c 0 4 68 15 14 68 c0 c 0 1 0 1 0 0 1 1c 0 4 ac 43 c0 56 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 99 3c 81 80 0 1 0 2 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1 0 1 c0 c 0 1 0 1 0 0 1 1c 0 4 68 15 14 68 c0 c 0 1 0 1 0 0 1 1c 0 4 ac 43 c0 56 
-
-Info: received data --- 0 7 81 80 0 1 0 2 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1c 0 1 c0 c 0 1c 0 1 0 0 0 20 0 10 26 6 47 0 30 33 0 0 0 0 0 0 68 15 14 68 c0 c 0 1c 0 1 0 0 0 20 0 10 26 6 47 0 30 35 0 0 0 0 0 0 ac 43 c0 56 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- d6 aa 81 80 0 1 0 2 0 0 0 0 e 74 72 61 63 6b 65 72 2d 70 75 62 6c 69 63 5 74 6a 75 70 74 3 6f 72 67 0 0 1c 0 1 c0 c 0 1c 0 1 0 0 0 20 0 10 26 6 47 0 30 33 0 0 0 0 0 0 68 15 14 68 c0 c 0 1c 0 1 0 0 0 20 0 10 26 6 47 0 30 35 0 0 0 0 0 0 ac 43 c0 56 
-
-Info: received data --- 21 ee 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 
+Info: received data --- 19 d5 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
 Info: It's a query message
 Info: found local record
-Info: send local record to client --- 21 ee 81 80 0 1 0 3 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 6a 0 1 0 1 0 0 0 20 0 4 6f dd 1d fe 
+Info: send local record to client --- 19 d5 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
 
-Info: received data --- b7 4c 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: received data --- f1 d3 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
 Info: It's a query message
 Info: found local record
-Info: send local record to client --- b7 4c 81 80 0 1 0 2 0 1 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 4a 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 22 a 68 6f 73 74 6d 61 73 74 65 72 c0 4a 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+Info: send local record to client --- f1 d3 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1 0 1 
 
-Info: received data --- 79 94 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 8 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 
-
-Info: received data --- 84 d2 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 9 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 
-
-Info: received data --- 79 94 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 a 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 
-
-Info: received data --- 84 d2 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 b 1 0 0 1 0 0 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 
-
-Info: received data --- 0 8 81 80 0 1 0 1 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 c0 c 0 1 0 1 0 0 0 fb 0 4 78 fd ff a2 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 79 94 81 80 0 1 0 1 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 c0 c 0 1 0 1 0 0 0 fb 0 4 78 fd ff a2 
-
-Info: received data --- 0 9 81 80 0 1 0 0 0 1 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 c0 16 0 6 0 1 0 0 0 37 0 30 3 6e 73 31 6 67 6f 6f 67 6c 65 3 63 6f 6d 0 9 64 6e 73 2d 61 64 6d 69 6e c0 35 16 7c 5e 35 0 0 3 84 0 0 3 84 0 0 7 8 0 0 0 3c 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 84 d2 81 80 0 1 0 0 0 1 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 c0 16 0 6 0 1 0 0 0 37 0 30 3 6e 73 31 6 67 6f 6f 67 6c 65 3 63 6f 6d 0 9 64 6e 73 2d 61 64 6d 69 6e c0 35 16 7c 5e 35 0 0 3 84 0 0 3 84 0 0 7 8 0 0 0 3c 
-
-Info: received data --- 0 a 81 80 0 1 0 1 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 c0 c 0 1 0 1 0 0 0 fb 0 4 78 fd ff a2 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 79 94 81 80 0 1 0 1 0 0 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1 0 1 c0 c 0 1 0 1 0 0 0 fb 0 4 78 fd ff a2 
-
-Info: received data --- 0 b 81 80 0 1 0 0 0 1 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 c0 16 0 6 0 1 0 0 0 37 0 30 3 6e 73 31 6 67 6f 6f 67 6c 65 3 63 6f 6d 0 9 64 6e 73 2d 61 64 6d 69 6e c0 35 16 7c 5e 35 0 0 3 84 0 0 3 84 0 0 7 8 0 0 0 3c 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 84 d2 81 80 0 1 0 0 0 1 0 0 9 74 72 61 6e 73 6c 61 74 65 6 67 6f 6f 67 6c 65 2 63 6e 0 0 1c 0 1 c0 16 0 6 0 1 0 0 0 37 0 30 3 6e 73 31 6 67 6f 6f 67 6c 65 3 63 6f 6d 0 9 64 6e 73 2d 61 64 6d 69 6e c0 35 16 7c 5e 35 0 0 3 84 0 0 3 84 0 0 7 8 0 0 0 3c 
-
-Info: received data --- 2c bf 1 0 0 1 0 0 0 0 0 0 8 61 72 72 61 79 38 30 36 4 70 72 6f 64 2 64 6f 3 64 73 70 2 6d 70 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
-Info: It's a query message
-Info: can't found local record, ask remote dns server
-Info: send request to remote dns server --- 0 c 1 0 0 1 0 0 0 0 0 0 8 61 72 72 61 79 38 30 36 4 70 72 6f 64 2 64 6f 3 64 73 70 2 6d 70 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
-
-Info: received data --- 0 c 81 80 0 1 0 0 0 1 0 0 8 61 72 72 61 79 38 30 36 4 70 72 6f 64 2 64 6f 3 64 73 70 2 6d 70 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 15 0 6 0 1 0 0 0 a1 0 3d 6 6e 73 31 2d 30 36 9 61 7a 75 72 65 2d 64 6e 73 c0 2e 13 61 7a 75 72 65 64 6e 73 2d 68 6f 73 74 6d 61 73 74 65 72 c0 24 0 0 0 1 0 0 e 10 0 0 1 2c 0 24 ea 0 0 0 1 2c 
-Info: It's a response message
-Info: message id is valid, found correspond client, cache this message
-Info: send remote dns server record to client --- 2c bf 81 80 0 1 0 0 0 1 0 0 8 61 72 72 61 79 38 30 36 4 70 72 6f 64 2 64 6f 3 64 73 70 2 6d 70 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 15 0 6 0 1 0 0 0 a1 0 3d 6 6e 73 31 2d 30 36 9 61 7a 75 72 65 2d 64 6e 73 c0 2e 13 61 7a 75 72 65 64 6e 73 2d 68 6f 73 74 6d 61 73 74 65 72 c0 24 0 0 0 1 0 0 e 10 0 0 1 2c 0 24 ea 0 0 0 1 2c 
-
-Info: received data --- 4b 5f 1 0 0 1 0 0 0 0 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 
+Info: received data --- 62 1f 1 0 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 
 Info: It's a query message
 Info: found local record
-Info: send local record to client --- 4b 5f 81 80 0 1 0 2 0 1 0 0 6 76 6f 72 74 65 78 4 64 61 74 61 9 6d 69 63 72 6f 73 6f 66 74 3 63 6f 6d 0 0 1c 0 1 c0 c 0 5 0 1 0 0 7 6f 0 27 6 61 73 69 6d 6f 76 6 76 6f 72 74 65 78 4 64 61 74 61 e 74 72 61 66 66 69 63 6d 61 6e 61 67 65 72 3 6e 65 74 0 c0 37 0 5 0 1 0 0 0 20 0 9 6 67 6c 6f 62 61 6c c0 3e c0 4a 0 6 0 1 0 0 0 20 0 2e 3 74 6d 31 6 64 6e 73 2d 74 6d c0 22 a 68 6f 73 74 6d 61 73 74 65 72 c0 4a 7 b ea 85 0 0 3 84 0 0 1 2c 0 24 ea 0 0 0 0 1e 
+Info: send local record to client --- 62 1f 81 82 0 1 0 0 0 0 0 0 3 75 2d 75 6 6f 6e 6c 69 6e 65 0 0 1c 0 1 

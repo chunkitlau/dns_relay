@@ -44,11 +44,28 @@ void delete_message_map() {
     free(message_map);
 }
 
+static int between(unsigned int a, unsigned int b, unsigned int c) {
+    return ((a <= b) && (b < c)) || ((c < a) && (a <= b)) || ((b < c) && (c < a));
+}
+
 Message_node *message_map_find(Message *message) {
     int index = message->hash % cache_size;
     Message_node *message_node = message_map[index];
     while(message_node->next_message_node && message_node->next_message_node->message->hash != message->hash) {
-         message_node = message_node->next_message_node;
+        if (message_node->next_message_node->message->ttl == ULONG_MAX ||
+            between(message_map_dynamic_id - dynamic_size, message_node->next_message_node->id, message_map_dynamic_id + 1)) {
+                message_node = message_node->next_message_node;
+        }
+        else {
+            //printf("delete message_node id %u\n", message_node->next_message_node->id);
+            Message_node *message_node_p = message_node->next_message_node;
+            message_node->next_message_node = message_node->next_message_node->next_message_node;
+            delete_message(message_node_p->message);
+            free(message_node_p);
+        }
+    }
+    if (message_node->next_message_node) {
+        message_node->next_message_node->id = ++message_map_dynamic_id;
     }
     return message_node;
 }
@@ -58,4 +75,8 @@ void message_map_insert(Message *message) {
     message_node->next_message_node = (Message_node *)malloc(sizeof(Message_node));
     message_node->next_message_node->message = message;
     message_node->next_message_node->next_message_node = NULL;
+    if (message->ttl != ULONG_MAX) {
+        message_node->next_message_node->id = ++message_map_dynamic_id;
+        //printf("message_map_dynamic_id: %u\n", message_map_dynamic_id);
+    }
 }
