@@ -18,7 +18,9 @@
         "client.h": "c",
         "protocol.h": "c",
         "string.h": "c",
-        "errno.h": "c"
+        "errno.h": "c",
+        "io.h": "c",
+        "winsock2.h": "c"
     },
     "C_Cpp.default.intelliSenseMode": "windows-gcc-x64"
 }

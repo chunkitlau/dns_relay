@@ -66,7 +66,7 @@ unsigned int form_standard_response(unsigned char *buffer, char *domain_name, un
     *type = htons(1);
     unsigned short *class = type + 1;
     *class = htons(1);
-    unsigned long *ttl = (unsigned long *)(class + 1);
+    unsigned int *ttl = (unsigned int *)(class + 1);
     *ttl = htonl(DEFAULT_TTL);
     unsigned short *rdlength = (unsigned short *)(ttl + 1);
     *rdlength = htons(4);
@@ -74,4 +74,59 @@ unsigned int form_standard_response(unsigned char *buffer, char *domain_name, un
     *rdata = htonl(ip);
 
     return (unsigned char *)(rdata + 1) - buffer;
+}
+
+void resolve_qname(unsigned char *buffer) {
+    printf("\nmessage qname: ");
+    for (int k = 12, l = 1; buffer[k]; k += l) {
+        for (l = 1; l <= buffer[k]; ++l) {
+            printf("%c", buffer[k + l]);
+        }
+        printf(".");
+    }
+    printf("\n");
+}
+
+static unsigned char *handle_name_type_class(unsigned char *buffer) {
+    while (*buffer) {
+        if (*buffer < (1u << 7)) buffer += *buffer + 1;
+        else {
+            ++buffer;
+            break;
+        }
+    }
+    buffer += 5;
+    return buffer;
+}
+
+static unsigned int min(unsigned int x, unsigned int y) {
+    return (x <= y) ? x : y;
+}
+
+static unsigned int handle_ttl(unsigned char *buffer, int operation, unsigned int delta_time) {
+    Header *header = (Header *)buffer;
+    decode_header(header);
+    unsigned qdcount = header->qdcount, ancount = header->ancount;
+    encode_header(header);
+    buffer += 12;
+    for (int k = 0; k < qdcount; ++k) handle_name_type_class(buffer);
+    unsigned int ttl = UINT_MAX;
+    for (int k = 0; k < ancount; ++k) {
+        handle_name_type_class(buffer);
+        if (operation == GET_TTL) 
+            ttl = min(ttl, ntohl(*((unsigned int *)buffer)));
+        if (operation == DECREASE_TTL) 
+            *((unsigned int *)buffer) = htonl(ntohl(*((unsigned int *)buffer)) - delta_time);
+        buffer += 4;
+        buffer += 2 + ntohs(*((unsigned short *)buffer));
+    }
+    return ttl;
+}
+
+unsigned int get_message_ttl(unsigned char *buffer) {
+    return handle_ttl(buffer, GET_TTL, 0);
+}
+
+void decrease_message_ttl(unsigned char *buffer, unsigned int delta_time) {
+    handle_ttl(buffer, DECREASE_TTL, delta_time);
 }

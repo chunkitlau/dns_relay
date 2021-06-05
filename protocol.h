@@ -2,8 +2,13 @@
 #define _PROTOCOL_H_
 
 #define DEFAULT_TTL 120
+#define GET_TTL 1
+#define DECREASE_TTL 2
+
 
 #include <string.h>
+#include <limits.h>
+#include <math.h>
 #include "client.h"
 
 /***************************************************
@@ -45,5 +50,8 @@ typedef struct Header {
 extern void decode_header(struct Header *header);
 extern void encode_header(struct Header *header);
 extern unsigned int form_standard_response(unsigned char *buffer, char *domain_name, unsigned int ip, unsigned int *question_size);
+extern void resolve_qname(unsigned char *buffer);
+extern unsigned int get_message_ttl(unsigned char *buffer);
+extern void decrease_message_ttl(unsigned char *buffer, unsigned int delta_time);
 
 #endif

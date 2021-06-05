@@ -35,6 +35,9 @@
  * +------------+
  */
 
+static FILE *log_file = NULL;
+static FILE *config_file = NULL;
+
 static int debug_level = 1; 
 static unsigned short port = DEFAULT_PORT;
 static int server_sock;
